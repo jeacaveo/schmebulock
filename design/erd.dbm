@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+         Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="0.8.1" last-position="0,0" last-zoom="1"
+	 default-schema="public" default-owner="postgres">
+<database name="new_database">
+</database>
+
+<schema name="public" protected="true" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<table name="item">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="168" y="272"/>
+	<column name="id" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="varchar"/>
+	</column>
+	<column name="amount" not-null="true">
+		<type name="float"/>
+	</column>
+	<column name="volume">
+		<type name="smallint"/>
+	</column>
+	<column name="weight">
+		<type name="smallint"/>
+	</column>
+	<column name="brand_id" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<column name="order_id" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<constraint name="item_id" type="pk-constr" table="public.item">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="brand">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="200" y="73"/>
+	<column name="id" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="varchar"/>
+	</column>
+	<constraint name="brand_id" type="pk-constr" table="public.brand">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="store">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="574" y="495"/>
+	<column name="id" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<constraint name="store_id" type="pk-constr" table="public.store">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="order">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="573" y="351"/>
+	<column name="id" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<column name="date" not-null="true">
+		<type name="date"/>
+	</column>
+	<column name="store_id" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<constraint name="order_id" type="pk-constr" table="public.&quot;order&quot;">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="item_brand_id" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.brand" table="public.item">
+	<columns names="brand_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="item_order_id" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;order&quot;" table="public.item">
+	<columns names="order_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="order_store_id" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.store" table="public.&quot;order&quot;">
+	<columns names="store_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="rel_items_brand" type="relfk"
+	 src-table="public.item"
+	 dst-table="public.brand"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_order_store" type="relfk"
+	 src-table="public.&quot;order&quot;"
+	 dst-table="public.store"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_item_order" type="relfk"
+	 src-table="public.item"
+	 dst-table="public.&quot;order&quot;"
+	 src-required="false" dst-required="false"/>
+
+</dbmodel>
