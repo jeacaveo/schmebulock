@@ -22,3 +22,16 @@ class OrderViewSet(viewsets.ModelViewSet):
     """ Endpoint for Order. """
     queryset = models.Order.objects.all()
     serializer_class = serializers.OrderSerializer
+
+    # Override
+    def get_serializer_class(self):
+        """
+        Override!
+
+        Using custom nested serializer when requested.
+
+        """
+        if (self.request.method == "GET" and
+                self.request.query_params.get("nested")):
+            return serializers.OrderNestedSerializer
+        return serializers.OrderSerializer

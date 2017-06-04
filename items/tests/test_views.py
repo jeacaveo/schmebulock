@@ -7,7 +7,7 @@ from rest_framework.test import APITestCase
 from .. import models
 
 
-class BrandEndpointBasicTests(APITestCase):
+class BrandEndpointTests(APITestCase):
     """ Test Brand endpoint.  """
 
     endpoint_name = "brand"
@@ -44,7 +44,7 @@ class BrandEndpointBasicTests(APITestCase):
         self.assertEqual(data[0], expected_data)
 
 
-class StoreEndpointBasicTests(APITestCase):
+class StoreEndpointTests(APITestCase):
     """ Test Store endpoint.  """
 
     endpoint_name = "store"
@@ -81,7 +81,7 @@ class StoreEndpointBasicTests(APITestCase):
         self.assertEqual(data[0], expected_data)
 
 
-class OrderEndpointBasicTests(APITestCase):
+class OrderEndpointTests(APITestCase):
     """ Test Order endpoint.  """
 
     endpoint_name = "order"
@@ -120,3 +120,23 @@ class OrderEndpointBasicTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0], expected_data)
+
+    def test_get_detail_nested(self):
+        """ Test GET detail nested returns nested data. """
+        # Given
+        expected_date = "2017-06-04"
+        expected_name = "Store name"
+        store = models.Store.objects.create(name=expected_name)
+        order = models.Order.objects.create(date=expected_date, store=store)
+        expected_data = {"id": order.id,
+                         "date": expected_date,
+                         "store": {"id": store.id, "name": store.name}}
+        url = reverse("{}-detail".format(self.endpoint_name),
+                      args=[order.id])
+
+        # When
+        response = self.client.get(url, data={"nested": True})
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, expected_data)

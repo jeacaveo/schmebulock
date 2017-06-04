@@ -29,3 +29,14 @@ class OrderSerializer(serializers.ModelSerializer):
         """ Meta data for serializer. """
         model = Order
         fields = ('id', 'date', 'store')
+
+
+class OrderNestedSerializer(serializers.ModelSerializer):
+    """ Serializer for nested Order model. """
+
+    store = StoreSerializer()
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = Order
+        fields = ('id', 'date', 'store')
