@@ -18,3 +18,13 @@ class Store(models.Model):
     def __str__(self):
         """ String representation for model. """
         return self.name
+
+
+class Order(models.Model):
+    """ Representation of a store (IKEA, PricesMart, etc.). """
+    date = models.DateField()
+    store = models.ForeignKey(Store)
+
+    def __str__(self):
+        """ String representation for model. """
+        return "{} - {}".format(self.store.name, self.date)

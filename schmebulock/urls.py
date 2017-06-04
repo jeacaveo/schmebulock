@@ -24,6 +24,7 @@ from items import views as item_views
 ROUTER = routers.DefaultRouter()
 ROUTER.register(r"brands", item_views.BrandViewSet)
 ROUTER.register(r"stores", item_views.StoreViewSet)
+ROUTER.register(r"orders", item_views.OrderViewSet)
 
 urlpatterns = [
     url(r"^admin/", admin.site.urls),

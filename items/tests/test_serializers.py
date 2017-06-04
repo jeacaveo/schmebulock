@@ -1,7 +1,7 @@
 """ Test for all serializers of items app. """
 from django.test import TestCase
 
-from ..serializers import BrandSerializer, StoreSerializer
+from ..serializers import BrandSerializer, OrderSerializer, StoreSerializer
 
 
 class BrandSerializerTest(TestCase):
@@ -29,6 +29,21 @@ class StoreSerializerTest(TestCase):
 
         # When
         serializer = StoreSerializer()
+
+        # Then
+        self.assertEqual(serializer.data, expected_data)
+
+
+class OrderSerializerTest(TestCase):
+    """ Tests for Order serializer. """
+
+    def test_fields(self):
+        """ Test fields for serializer. """
+        # Given
+        expected_data = {"date": None, "store": None}
+
+        # When
+        serializer = OrderSerializer()
 
         # Then
         self.assertEqual(serializer.data, expected_data)

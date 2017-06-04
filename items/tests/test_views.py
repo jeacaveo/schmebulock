@@ -30,9 +30,9 @@ class BrandEndpointBasicTests(APITestCase):
         """ Test GET list/all expected results when data available. """
         # Given
         expected_name = "Brand name"
-        expected_data = {"id": 1, "name": expected_name}
+        brand = models.Brand.objects.create(name=expected_name)
+        expected_data = {"id": brand.id, "name": expected_name}
         url = reverse("{}-list".format(self.endpoint_name))
-        models.Brand.objects.create(name=expected_name)
 
         # When
         response = self.client.get(url)
@@ -42,7 +42,6 @@ class BrandEndpointBasicTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0], expected_data)
-        self.assertEqual(data[0].get("name"), expected_name)
 
 
 class StoreEndpointBasicTests(APITestCase):
@@ -68,9 +67,9 @@ class StoreEndpointBasicTests(APITestCase):
         """ Test GET list/all expected results when data available. """
         # Given
         expected_name = "Store name"
-        expected_data = {"id": 1, "name": expected_name}
+        store = models.Store.objects.create(name=expected_name)
+        expected_data = {"id": store.id, "name": expected_name}
         url = reverse("{}-list".format(self.endpoint_name))
-        models.Store.objects.create(name=expected_name)
 
         # When
         response = self.client.get(url)
@@ -80,4 +79,44 @@ class StoreEndpointBasicTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0], expected_data)
-        self.assertEqual(data[0].get("name"), expected_name)
+
+
+class OrderEndpointBasicTests(APITestCase):
+    """ Test Order endpoint.  """
+
+    endpoint_name = "order"
+    model = models.Order
+
+    def test_get_list_empty(self):
+        """ Test GET list/all returns expected when no data available. """
+        # Given
+        expected_data = []
+        url = reverse("{}-list".format(self.endpoint_name))
+
+        # When
+        response = self.client.get(url)
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, expected_data)
+
+    def test_get_list(self):
+        """ Test GET list/all expected results when data available. """
+        # Given
+        expected_date = "2017-06-04"
+        expected_name = "Store name"
+        store = models.Store.objects.create(name=expected_name)
+        order = models.Order.objects.create(date=expected_date, store=store)
+        expected_data = {"id": order.id,
+                         "date": expected_date,
+                         "store": store.id}
+        url = reverse("{}-list".format(self.endpoint_name))
+
+        # When
+        response = self.client.get(url)
+        data = response.data
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0], expected_data)

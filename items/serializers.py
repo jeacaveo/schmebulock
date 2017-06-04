@@ -1,7 +1,7 @@
 """ Serializers of items app. """
 from rest_framework import serializers
 
-from .models import Brand, Store
+from .models import Brand, Order, Store
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -20,3 +20,12 @@ class StoreSerializer(serializers.ModelSerializer):
         """ Meta data for serializer. """
         model = Store
         fields = ('id', 'name')
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    """ Serializer for Order model. """
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = Order
+        fields = ('id', 'date', 'store')
