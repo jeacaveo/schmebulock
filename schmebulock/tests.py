@@ -9,7 +9,7 @@ class TestModel(models.Model):
     """ Dummy model for test purposes. """
     field1 = models.IntegerField()
 
-    class Meta:  # pylint: disable=too-few-public-methods
+    class Meta:
         """ Assigning an app_label just to make it run. """
         app_label = "schmebulock"
 
