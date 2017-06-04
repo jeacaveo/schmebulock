@@ -2,7 +2,7 @@
 from django.test import TestCase
 
 from schmebulock.utils import get_model_fields
-from ..models import Brand
+from ..models import Brand, Store
 
 
 class BrandModelTest(TestCase):
@@ -30,3 +30,30 @@ class BrandModelTest(TestCase):
 
         # Then
         self.assertEqual(get_model_fields(brand), expected_fields)
+
+
+class StoreModelTest(TestCase):
+    """ Tests for Store model. """
+
+    def test_string_representation(self):
+        """ Test string representation. """
+        # Given
+        name = "Sample store"
+
+        # When
+        store = Store(name=name)
+
+        # Then
+        self.assertEqual(str(store), name)
+        self.assertEqual(str(store), store.name)
+
+    def test_fields(self):
+        """ Test fields for model. """
+        # Given
+        expected_fields = ["id", "name"]
+
+        # When
+        store = Store()
+
+        # Then
+        self.assertEqual(get_model_fields(store), expected_fields)

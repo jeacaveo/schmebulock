@@ -10,4 +10,9 @@ class BrandViewSet(viewsets.ModelViewSet):
     """ Endpoint for Brands. """
     queryset = models.Brand.objects.all()
     serializer_class = serializers.BrandSerializer
-    # permission_classes = [IsAccountAdminOrReadOnly]
+
+
+class StoreViewSet(viewsets.ModelViewSet):
+    """ Endpoint for Stores. """
+    queryset = models.Store.objects.all()
+    serializer_class = serializers.StoreSerializer

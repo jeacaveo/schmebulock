@@ -9,3 +9,12 @@ class Brand(models.Model):
     def __str__(self):
         """ String representation for model. """
         return self.name
+
+
+class Store(models.Model):
+    """ Representation of a store (IKEA, PricesMart, etc.). """
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        """ String representation for model. """
+        return self.name
