@@ -1,6 +1,7 @@
 """ Test for all models of items app. """
 from django.test import TestCase
 
+from schmebulock.utils import get_model_fields
 from ..models import Brand
 
 
@@ -28,4 +29,4 @@ class BrandModelTest(TestCase):
         brand = Brand()
 
         # Then
-        self.assertEqual(brand, expected_fields)
+        self.assertEqual(get_model_fields(brand), expected_fields)
