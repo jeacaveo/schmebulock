@@ -20,9 +20,8 @@ Admin credentials:
 
 Tests:
 
-An __init__.py file needs to be added to each subfolder (similar to the on in items app).
-When a new test file is added, the init file needs to be updated.
+python manage.py test [APP_NAME][.TEST_MODULE][:TestClass][.TEST_NAME]
 
 Coverage:
 
-coverage run --source='APP_DIRECTORY' manage.py test APP_NAME
+coverage run --source='PATH_TO_APP_PROJECT_DIRECTORY' manage.py test  [APP_NAME][.TEST_MODULE][:TestClass][.TEST_NAME]

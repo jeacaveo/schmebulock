@@ -20,7 +20,7 @@ class BrandModelTest(TestCase):
         self.assertEqual(str(brand), name)
         self.assertEqual(str(brand), brand.name)
 
-    def test_model_fields(self):
+    def test_fields(self):
         """ Test fields for model. """
         # Given
         expected_fields = ["id", "name"]
