@@ -17,3 +17,12 @@ python manage.py createsuperuser
 Admin credentials:
     Username: admin
     Password: admin123
+
+Tests:
+
+An __init__.py file needs to be added to each subfolder (similar to the on in items app).
+When a new test file is added, the init file needs to be updated.
+
+Coverage:
+
+coverage run --source='APP_DIRECTORY' manage.py test APP_NAME
