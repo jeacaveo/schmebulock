@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from schmebulock import utils
 
+
 class TestModel(models.Model):
     """ Dummy model for test purposes. """
     field1 = models.IntegerField()

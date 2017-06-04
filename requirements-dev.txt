@@ -5,7 +5,6 @@ Django==1.11.2
 django-appconf==1.0.2
 django-measurement==2.4.0
 django-money==0.11.2
-django-nose==1.4.4
 djangorestframework==3.6.3
 ipdb==0.10.3
 ipython==6.1.0
