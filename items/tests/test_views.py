@@ -1,5 +1,7 @@
 """ Tests for all views of items app. """
 
+from model_mommy import mommy
+
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -24,19 +26,18 @@ class BrandEndpointTests(APITestCase):
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, expected_data)
+        self.assertEqual(response.json(), expected_data)
 
     def test_get_list(self):
         """ Test GET list/all expected results when data available. """
         # Given
-        expected_name = "Brand name"
-        brand = models.Brand.objects.create(name=expected_name)
-        expected_data = {"id": brand.id, "name": expected_name}
+        brand = mommy.make("Brand")
+        expected_data = {"id": brand.id, "name": brand.name}
         url = reverse("{}-list".format(self.endpoint_name))
 
         # When
         response = self.client.get(url)
-        data = response.data
+        data = response.json()
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -61,19 +62,18 @@ class StoreEndpointTests(APITestCase):
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, expected_data)
+        self.assertEqual(response.json(), expected_data)
 
     def test_get_list(self):
         """ Test GET list/all expected results when data available. """
         # Given
-        expected_name = "Store name"
-        store = models.Store.objects.create(name=expected_name)
-        expected_data = {"id": store.id, "name": expected_name}
+        store = mommy.make("Store")
+        expected_data = {"id": store.id, "name": store.name}
         url = reverse("{}-list".format(self.endpoint_name))
 
         # When
         response = self.client.get(url)
-        data = response.data
+        data = response.json()
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -98,23 +98,20 @@ class OrderEndpointTests(APITestCase):
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, expected_data)
+        self.assertEqual(response.json(), expected_data)
 
     def test_get_list(self):
         """ Test GET list/all expected results when data available. """
         # Given
-        expected_date = "2017-06-04"
-        expected_name = "Store name"
-        store = models.Store.objects.create(name=expected_name)
-        order = models.Order.objects.create(date=expected_date, store=store)
+        order = mommy.make("Order")
         expected_data = {"id": order.id,
-                         "date": expected_date,
-                         "store": store.id}
+                         "date": order.date.isoformat(),
+                         "store": order.store.id}
         url = reverse("{}-list".format(self.endpoint_name))
 
         # When
         response = self.client.get(url)
-        data = response.data
+        data = response.json()
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -124,13 +121,11 @@ class OrderEndpointTests(APITestCase):
     def test_get_detail_nested(self):
         """ Test GET detail nested returns nested data. """
         # Given
-        expected_date = "2017-06-04"
-        expected_name = "Store name"
-        store = models.Store.objects.create(name=expected_name)
-        order = models.Order.objects.create(date=expected_date, store=store)
+        order = mommy.make("Order")
         expected_data = {"id": order.id,
-                         "date": expected_date,
-                         "store": {"id": store.id, "name": store.name}}
+                         "date": order.date.isoformat(),
+                         "store": {"id": order.store.id,
+                                   "name": order.store.name}}
         url = reverse("{}-detail".format(self.endpoint_name),
                       args=[order.id])
 
@@ -139,4 +134,4 @@ class OrderEndpointTests(APITestCase):
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, expected_data)
+        self.assertEqual(response.json(), expected_data)

@@ -1,8 +1,9 @@
 """ Test for all models of items app. """
 from django.test import TestCase
 
+from model_mommy import mommy
+
 from schmebulock.utils import get_model_fields
-from ..models import Brand, Store, Order
 
 
 class BrandModelTest(TestCase):
@@ -14,7 +15,7 @@ class BrandModelTest(TestCase):
         name = "Sample brand"
 
         # When
-        brand = Brand(name=name)
+        brand = mommy.make("Brand", name=name)
 
         # Then
         self.assertEqual(str(brand), name)
@@ -26,7 +27,7 @@ class BrandModelTest(TestCase):
         expected_fields = ["id", "name"]
 
         # When
-        brand = Brand()
+        brand = mommy.make("Brand")
 
         # Then
         self.assertEqual(get_model_fields(brand), expected_fields)
@@ -41,7 +42,7 @@ class StoreModelTest(TestCase):
         name = "Sample store"
 
         # When
-        store = Store(name=name)
+        store = mommy.make("Store", name=name)
 
         # Then
         self.assertEqual(str(store), name)
@@ -53,7 +54,7 @@ class StoreModelTest(TestCase):
         expected_fields = ["id", "name"]
 
         # When
-        store = Store()
+        store = mommy.make("Store")
 
         # Then
         self.assertEqual(get_model_fields(store), expected_fields)
@@ -64,16 +65,12 @@ class OrderModelTest(TestCase):
 
     def test_string_representation(self):
         """ Test string representation. """
-        # Given
-        date = "2017-06-04"
-        store_name = "Sample store"
-        store = Store.objects.create(name=store_name)
-
         # When
-        order = Order(date=date, store=store)
+        order = mommy.make("Order")
 
         # Then
-        self.assertEqual(str(order), "{} - {}".format(store_name, date))
+        self.assertEqual(str(order), "{} - {}".format(
+            order.store.name, order.date))
 
     def test_fields(self):
         """ Test fields for model. """
@@ -81,7 +78,7 @@ class OrderModelTest(TestCase):
         expected_fields = ["id", "date", "store"]
 
         # When
-        order = Order()
+        order = mommy.make("Order")
 
         # Then
         self.assertEqual(get_model_fields(order), expected_fields)
