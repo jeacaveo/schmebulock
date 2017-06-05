@@ -1,6 +1,8 @@
 """ Test for all models of items app. """
 from django.test import TestCase
 
+from djmoney.models.fields import MoneyPatched
+from measurement.measures import Weight
 from model_mommy import mommy
 
 from schmebulock.utils import get_model_fields
@@ -82,3 +84,33 @@ class OrderModelTest(TestCase):
 
         # Then
         self.assertEqual(get_model_fields(order), expected_fields)
+
+
+class ItemModelTest(TestCase):
+    """ Tests for Item model. """
+
+    def test_string_representation(self):
+        """ Test string representation. """
+        # When
+        item = mommy.make("Item",
+                          name="Blue Cheese",
+                          price=MoneyPatched(50, 'DOP'),
+                          weight=Weight(kg=0.500),
+                          brand__name="Generic",)
+
+        # Then
+        self.assertEqual(
+            str(item),
+            "0.5 kg of Blue Cheese (Generic) at 50.00 DOP")
+
+    def test_fields(self):
+        """ Test fields for model. """
+        # Given
+        expected_fields = ["id", "name", "price_currency", "price",
+                           "volume", "weight", "brand", "order"]
+
+        # When
+        item = mommy.make("Item")
+
+        # Then
+        self.assertEqual(get_model_fields(item), expected_fields)

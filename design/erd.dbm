@@ -21,7 +21,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="name" not-null="true">
 		<type name="varchar"/>
 	</column>
-	<column name="amount" not-null="true">
+	<column name="price" not-null="true">
 		<type name="float"/>
 	</column>
 	<column name="volume">
