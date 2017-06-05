@@ -24,4 +24,8 @@ python manage.py test [APP_NAME][.TEST_MODULE][:TestClass][.TEST_NAME]
 
 Coverage:
 
-coverage run --source='PATH_TO_APP_PROJECT_DIRECTORY' manage.py test  [APP_NAME][.TEST_MODULE][:TestClass][.TEST_NAME]
+coverage run --source='PATH_TO_APP_PROJECT_DIRECTORY' manage.py test  [APP_NAME][.TEST_MODULE][:TestClass][.TEST_NAME] && coverage report -m
+
+To test coverage for whole proeject:
+
+    coverage run --source=. manage.py test && coverage report -m

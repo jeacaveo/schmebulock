@@ -8,6 +8,24 @@ from model_mommy import mommy
 from schmebulock.utils import get_model_fields
 
 
+class ItemAppTest(TestCase):
+    """ Tests for Brand model. """
+
+    def test_app_name(self):
+        """ Test name of application. """
+        from ..apps import ItemsConfig
+        from sys import modules
+        current_module = modules[__name__]
+        expected_name = "Items"
+
+        # When
+        app_config = ItemsConfig(app_name="schmebulock.items",
+                                 app_module=current_module)
+
+        # Then
+        self.assertEqual(app_config.verbose_name, expected_name)
+
+
 class BrandModelTest(TestCase):
     """ Tests for Brand model. """
 
