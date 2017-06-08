@@ -152,3 +152,24 @@ class ItemSerializer(serializers.ModelSerializer):
                 **{unit or "g": weight})
 
         return super().update(instance, validated_data)
+
+
+class ItemNestedSerializer(serializers.ModelSerializer):
+    """ Serializer for nested Item model. """
+
+    currency = serializers.CharField(source="price_currency", required=False)
+    unit = serializers.SerializerMethodField()
+    volume = serializers.FloatField(source="volume.value")
+    weight = serializers.FloatField(source="weight.value")
+    brand = StoreSerializer()
+    order = OrderNestedSerializer()
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = Item
+        fields = ("id", "name", "price", "currency", "unit",
+                  "volume", "weight", "brand", "order")
+
+    def get_unit(self, obj):
+        """ Custom field that needs to get data from volume or weight. """
+        return obj.volume.unit if obj.volume else obj.weight.unit

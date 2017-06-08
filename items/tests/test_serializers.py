@@ -1,4 +1,6 @@
 """ Test for all serializers of items app. """
+from json import dumps, loads
+
 from django.test import TestCase
 from measurement.measures import Volume, Weight
 
@@ -7,10 +9,10 @@ from model_mommy import mommy
 from ..serializers import (
     BrandSerializer,
     ItemSerializer,
+    ItemNestedSerializer,
     OrderSerializer,
     OrderNestedSerializer,
-    StoreSerializer,
-    )
+    StoreSerializer)
 
 
 class BrandSerializerTest(TestCase):
@@ -452,3 +454,27 @@ class ItemSerializerTest(TestCase):
         self.assertEqual(data.get("unit"), self.default_volume_unit)
         self.assertEqual(data.get("brand"), brand.id)
         self.assertEqual(data.get("order"), order.id)
+
+
+class ItemNestedSerializerTest(TestCase):
+    """ Tests for nested Item serializer. """
+
+    def test_fields(self):
+        """ Test fields for serializer. """
+        # Given
+        item = mommy.make("Item", price=10, volume=Volume(l=1))
+        item.refresh_from_db()  # To trigger MeasurementField updates
+        expected_data = {
+            "id": item.id, "name": item.name, "price": "10.000",
+            "currency": item.price_currency, "unit": "cubic_meter",
+            "volume": 0.001, "weight": None,
+            "brand": {"id": item.brand.id, "name": item.brand.name},
+            "order": {"id": item.order.id, "date": item.order.date.isoformat(),
+                      "store": {"id": item.order.store.id,
+                                "name": item.order.store.name}}}
+
+        # When
+        serializer = ItemNestedSerializer(item)
+
+        # Then
+        self.assertEqual(loads(dumps(serializer.data)), expected_data)
