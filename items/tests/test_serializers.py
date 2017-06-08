@@ -5,6 +5,7 @@ from model_mommy import mommy
 
 from ..serializers import (
     BrandSerializer,
+    ItemSerializer,
     OrderSerializer,
     OrderNestedSerializer,
     StoreSerializer,
@@ -71,3 +72,87 @@ class OrderNestedSerializerTest(TestCase):
 
         # Then
         self.assertEqual(serializer.data, expected_data)
+
+
+class ItemSerializerTest(TestCase):
+    """ Tests for Item serializer. """
+
+    def test_fields(self):
+        """ Test fields for serializer. """
+        # Given
+        item = mommy.make("Item", price=10)
+        expected_data = {
+            "id": item.id, "name": item.name, "price": "10.000",
+            "currency": item.price_currency, "volume": None, "weight": None,
+            "brand": item.brand.id, "order": item.order.id}
+
+        # When
+        serializer = ItemSerializer(item)
+
+        # Then
+        self.assertEqual(serializer.data, expected_data)
+
+    def test_save_errors_empty(self):
+        """ Test erros on empty data. """
+        # Given
+        expected_data = {"name": ["This field is required."],
+                         "brand": ["This field is required."],
+                         "order": ["This field is required."]}
+        data = {}
+
+        # When
+        serializer = ItemSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+    def test_save_errors_no_price(self):
+        """ Test erros when price is not provided. """
+        # Given
+        brand = mommy.make("Brand")
+        order = mommy.make("Order")
+        expected_data = {"price": ["This field is required."]}
+        data = {"name": "Item X", "brand": brand.id, "order": order.id}
+
+        # When
+        serializer = ItemSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+    def test_save_errors_null(self):
+        """ Test erros when required fields are null. """
+        # Given
+        expected_data = {"name": ["This field may not be null."],
+                         "price": ["This field may not be null."],
+                         "brand": ["This field may not be null."],
+                         "order": ["This field may not be null."]}
+        data = {"name": None, "price": None, "brand": None, "order": None}
+
+        # When
+        serializer = ItemSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+    def test_save(self):
+        """ Test erros when required fields are null. """
+        # Given
+        brand = mommy.make("Brand")
+        order = mommy.make("Order")
+        data = {"name": "Item X", "price": 10,
+                "brand": brand.id, "order": order.id}
+
+        # When
+        serializer = ItemSerializer(data=data)
+        serializer.is_valid()
+        obj = serializer.save()
+
+        # Then
+        self.assertEqual(str(obj.price.amount), "10.000")
+        self.assertEqual(obj.price_currency, "USD")
+        self.assertEqual(obj.brand, brand)
+        self.assertEqual(obj.order, order)
