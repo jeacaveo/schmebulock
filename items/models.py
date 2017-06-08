@@ -37,8 +37,8 @@ class Order(models.Model):
 class Item(models.Model):
     """
     Representation of an item:
-        0.5 kg of Blue Cheese (Generic) at 50.00 DOP
-        1.0 lb of Bacon (XXX) at 1.00 USD
+        Blue Cheese (Generic), 0.5 kg at 50.00 DOP
+        Bacon (XXX), 1.0 lb at 1.00 USD
 
     """
     name = models.CharField(max_length=128)
@@ -50,8 +50,8 @@ class Item(models.Model):
 
     def __str__(self):
         """ String representation for model. """
-        return "{0} of {1} ({2}) at {3}".format(
-            self.volume or self.weight,
+        return "{0} ({1}), {2} at {3}".format(
             self.name,
             self.brand.name,
+            self.volume or self.weight,
             self.price)

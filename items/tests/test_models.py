@@ -119,7 +119,7 @@ class ItemModelTest(TestCase):
         # Then
         self.assertEqual(
             str(item),
-            "0.5 kg of Blue Cheese (Generic) at 50.00 DOP")
+            "Blue Cheese (Generic), 0.5 kg at 50.00 DOP")
 
     def test_fields(self):
         """ Test fields for model. """
