@@ -214,13 +214,13 @@ class ItemSerializerTest(TestCase):
         # Then
         self.assertEqual(serializer.errors, expected_data)
 
-    def test_save_volume(self):
-        """ Test successful save when volume is provided. """
+    def test_save_volume_default_unit(self):
+        """ Test successful save when volume is provided with default unit. """
         # Given
         brand = mommy.make("Brand")
         order = mommy.make("Order")
-        data = {"name": "Item X", "price": 10, "volume": 100, "unit": "l",
-                "brand": brand.id, "order": order.id}
+        data = {"name": "Item X", "price": 10, "volume": 100,
+                "unit": "cubic_meter", "brand": brand.id, "order": order.id}
 
         # When
         serializer = ItemSerializer(data=data)
@@ -230,11 +230,41 @@ class ItemSerializerTest(TestCase):
         # Then
         self.assertEqual(str(obj.price.amount), "10.000")
         self.assertEqual(obj.price_currency, "USD")
-        self.assertEqual(str(obj.volume), "100.0")
+        self.assertEqual(obj.volume.value, 100.0)
+        self.assertEqual(obj.volume.unit, "cubic_meter")
+        self.assertEqual(obj.volume.standard, 100.0)
+        self.assertEqual(obj.volume.cubic_meter, 100.0)
         self.assertEqual(obj.brand, brand)
         self.assertEqual(obj.order, order)
 
-    def test_save_weight(self):
+    def test_save_volume_another_unit(self):
+        """
+        Test successful save when volume is provided with a unit
+        different than the default one.
+
+        """
+        # Given
+        brand = mommy.make("Brand")
+        order = mommy.make("Order")
+        data = {"name": "Item X", "price": 10, "volume": 100,
+                "unit": "l", "brand": brand.id, "order": order.id}
+
+        # When
+        serializer = ItemSerializer(data=data)
+        serializer.is_valid()
+        obj = serializer.save()
+
+        # Then
+        self.assertEqual(str(obj.price.amount), "10.000")
+        self.assertEqual(obj.price_currency, "USD")
+        self.assertEqual(obj.volume.value, 100.0)
+        self.assertEqual(obj.volume.unit, "l")
+        self.assertEqual(obj.volume.standard, 0.1)
+        self.assertEqual(obj.volume.cubic_meter, 0.1)
+        self.assertEqual(obj.brand, brand)
+        self.assertEqual(obj.order, order)
+
+    def test_save_weight_default_unit(self):
         """ Test successful save when weight is provided. """
         # Given
         brand = mommy.make("Brand")
@@ -250,6 +280,36 @@ class ItemSerializerTest(TestCase):
         # Then
         self.assertEqual(str(obj.price.amount), "10.000")
         self.assertEqual(obj.price_currency, "USD")
-        self.assertEqual(str(obj.weight), "100.0")
+        self.assertEqual(obj.weight.value, 100.0)
+        self.assertEqual(obj.weight.unit, "g")
+        self.assertEqual(obj.weight.standard, 100.0)
+        self.assertEqual(obj.weight.g, 100.0)
+        self.assertEqual(obj.brand, brand)
+        self.assertEqual(obj.order, order)
+
+    def test_save_weight_another_unit(self):
+        """
+        Test successful save when weight is provided with a unit
+        different than the default one.
+
+        """
+        # Given
+        brand = mommy.make("Brand")
+        order = mommy.make("Order")
+        data = {"name": "Item X", "price": 10, "weight": 100,
+                "unit": "oz", "brand": brand.id, "order": order.id}
+
+        # When
+        serializer = ItemSerializer(data=data)
+        serializer.is_valid()
+        obj = serializer.save()
+
+        # Then
+        self.assertEqual(str(obj.price.amount), "10.000")
+        self.assertEqual(obj.price_currency, "USD")
+        self.assertEqual(obj.weight.value, 100.0)
+        self.assertEqual(obj.weight.unit, "oz")
+        self.assertEqual(obj.weight.standard, 2834.95)
+        self.assertEqual(obj.weight.g, 2834.95)
         self.assertEqual(obj.brand, brand)
         self.assertEqual(obj.order, order)

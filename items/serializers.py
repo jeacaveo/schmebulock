@@ -105,5 +105,12 @@ class ItemSerializer(serializers.ModelSerializer):
     # Override
     def create(self, validated_data):
         """ Overriding to handle meassurement units. """
-        validated_data.pop("unit")
+        unit = validated_data.pop("unit")
+        volume = validated_data.get("volume")
+        weight = validated_data.get("weight")
+        if volume:
+            validated_data["volume"] = Volume(**{unit: volume})
+        elif weight:
+            validated_data["weight"] = Weight(**{unit: weight})
+
         return super().create(validated_data)
