@@ -92,7 +92,7 @@ class ItemSerializerTest(TestCase):
         # Then
         self.assertEqual(serializer.data, expected_data)
 
-    def test_save_errors_empty(self):
+    def test_errors_empty(self):
         """ Test erros on empty data. """
         # Given
         expected_data = {"name": ["This field is required."],
@@ -107,7 +107,7 @@ class ItemSerializerTest(TestCase):
         # Then
         self.assertEqual(serializer.errors, expected_data)
 
-    def test_save_errors_no_price(self):
+    def test_errors_no_price(self):
         """ Test erros when price is not provided. """
         # Given
         brand = mommy.make("Brand")
@@ -122,7 +122,7 @@ class ItemSerializerTest(TestCase):
         # Then
         self.assertEqual(serializer.errors, expected_data)
 
-    def test_save_errors_null(self):
+    def test_errors_null(self):
         """ Test erros when required fields are null. """
         # Given
         expected_data = {"name": ["This field may not be null."],
@@ -138,12 +138,31 @@ class ItemSerializerTest(TestCase):
         # Then
         self.assertEqual(serializer.errors, expected_data)
 
-    def test_save(self):
-        """ Test erros when required fields are null. """
+    def test_errors_no_volume_weight(self):
+        """ Test erros when both volume and weight fields are not provided. """
         # Given
         brand = mommy.make("Brand")
         order = mommy.make("Order")
+        expected_data = {"volume": ["This field is required if "
+                                    "'weight' is not available."],
+                         "weight": ["This field is required if "
+                                    "'volume' is not available."]}
         data = {"name": "Item X", "price": 10,
+                "brand": brand.id, "order": order.id}
+
+        # When
+        serializer = ItemSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+    def test_save_volume(self):
+        """ Test successful save when volume is provided. """
+        # Given
+        brand = mommy.make("Brand")
+        order = mommy.make("Order")
+        data = {"name": "Item X", "price": 10, "volume": 100,
                 "brand": brand.id, "order": order.id}
 
         # When
@@ -154,5 +173,26 @@ class ItemSerializerTest(TestCase):
         # Then
         self.assertEqual(str(obj.price.amount), "10.000")
         self.assertEqual(obj.price_currency, "USD")
+        self.assertEqual(str(obj.volume), "100")
+        self.assertEqual(obj.brand, brand)
+        self.assertEqual(obj.order, order)
+
+    def test_save_weight(self):
+        """ Test successful save when weight is provided. """
+        # Given
+        brand = mommy.make("Brand")
+        order = mommy.make("Order")
+        data = {"name": "Item X", "price": 10, "weight": 100,
+                "brand": brand.id, "order": order.id}
+
+        # When
+        serializer = ItemSerializer(data=data)
+        serializer.is_valid()
+        obj = serializer.save()
+
+        # Then
+        self.assertEqual(str(obj.price.amount), "10.000")
+        self.assertEqual(obj.price_currency, "USD")
+        self.assertEqual(str(obj.weight), "100")
         self.assertEqual(obj.brand, brand)
         self.assertEqual(obj.order, order)

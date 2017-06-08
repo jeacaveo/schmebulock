@@ -72,4 +72,11 @@ class ItemSerializer(serializers.ModelSerializer):
         if not attrs.get("price"):
             raise serializers.ValidationError(
                 {"price": "This field is required."})
+
+        if not attrs.get("volume") and not attrs.get("weight"):
+            raise serializers.ValidationError(
+                {"volume": ["This field is required if "
+                            "'weight' is not available."],
+                 "weight": ["This field is required if "
+                            "'volume' is not available."]})
         return attrs
