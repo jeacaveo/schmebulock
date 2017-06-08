@@ -1,4 +1,6 @@
 """ Test for utils under main app. """
+from collections import OrderedDict
+
 from django.db import models
 from django.test import TestCase
 
@@ -34,7 +36,7 @@ class GetChoicesTest(TestCase):
 
     def setUp(self):
         """ Data for all the tests. """
-        self.data = {"key1": "val1", "key2": "val2"}
+        self.data = OrderedDict([("key1", "val1"), ("key2", "val2")])
 
     def test_function(self):
         """ Test successful call to function with only required parameters. """
@@ -43,6 +45,18 @@ class GetChoicesTest(TestCase):
 
         # When
         choices = utils.get_choices(self.data)
+
+        # Then
+        self.assertEqual(choices, expected_choices)
+
+    def test_non_ordered_dict(self):
+        """ Test successful call to function with non OrderedDict. """
+        # Given
+        data = {"key1": "val1"}
+        expected_choices = [("val1", "key1")]
+
+        # When
+        choices = utils.get_choices(data)
 
         # Then
         self.assertEqual(choices, expected_choices)

@@ -43,8 +43,10 @@ class Item(models.Model):
     """
     name = models.CharField(max_length=128)
     price = MoneyField(max_digits=15, decimal_places=3, default_currency='USD')
-    volume = MeasurementField(measurement=Volume, null=True, blank=True)
-    weight = MeasurementField(measurement=Weight, null=True, blank=True)
+    volume = MeasurementField(measurement=Volume, null=True, blank=True,
+                              help_text="Unit in DB is always cubic meters")
+    weight = MeasurementField(measurement=Weight, null=True, blank=True,
+                              help_text="Unit in DB is always grams")
     brand = models.ForeignKey(Brand)
     order = models.ForeignKey(Order)
 
