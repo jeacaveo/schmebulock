@@ -81,13 +81,16 @@ class ItemSerializerTest(TestCase):
         self.default_volume_unit = "cubic_meter"
         self.default_weight_unit = "g"
 
-    def test_fields(self):
+    def test_fields_data(self):
         """ Test fields for serializer. """
         # Given
-        item = mommy.make("Item", price=10)
+        item = mommy.make("Item",
+                          price=10, volume=Volume(l=1), weight=Weight(g=1))
+        item.refresh_from_db()  # To trigger MeasurementField updates
         expected_data = {
             "id": item.id, "name": item.name, "price": "10.000",
-            "currency": item.price_currency, "volume": None, "weight": None,
+            "currency": item.price_currency, "unit": self.default_volume_unit,
+            "volume": 0.001, "weight": 1,
             "brand": item.brand.id, "order": item.order.id}
 
         # When
@@ -425,3 +428,27 @@ class ItemSerializerTest(TestCase):
         self.assertEqual(item.weight.value, expected_standard_value)
         self.assertEqual(item.weight.standard, expected_standard_value)
         self.assertEqual(item.weight.g, expected_standard_value)
+
+    def test_save_another_currency(self):
+        """ Test successful save when currency different than default one. """
+        # Given
+        brand = mommy.make("Brand")
+        order = mommy.make("Order")
+        data = {"name": "Item X", "price": 10, "volume": 100,
+                "unit": self.default_volume_unit, "currency": "DOP",
+                "brand": brand.id, "order": order.id}
+
+        # When
+        serializer = ItemSerializer(data=data)
+        serializer.is_valid()
+        obj = serializer.save()
+
+        # Then
+        data = serializer.data
+        obj.refresh_from_db()
+        self.assertEqual(obj.price_currency, "DOP")
+        self.assertEqual(data.get("price"), "10.000")
+        self.assertEqual(data.get("currency"), "DOP")
+        self.assertEqual(data.get("unit"), self.default_volume_unit)
+        self.assertEqual(data.get("brand"), brand.id)
+        self.assertEqual(data.get("order"), order.id)

@@ -46,7 +46,7 @@ class OrderNestedSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     """ Serializer for Item model. """
-    currency = serializers.SerializerMethodField()
+    currency = serializers.CharField(source="price_currency", required=False)
     unit = serializers.CharField(max_length=32, required=True, write_only=True)
 
     class Meta:
@@ -55,19 +55,10 @@ class ItemSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "price", "currency", "unit",
                   "volume", "weight", "brand", "order")
 
-    def get_currency(self, obj):
-        """
-        Get currency from model instance.
-
-        Currency it's generated from MoneyField and not actually in DB.
-
-        """
-        return obj.price_currency
-
     # Override
     def validate(self, attrs):
         """
-        Custom validations for MoneyField.
+        Custom validations for MoneyField and MeasurementField.
 
         price field is marked as not required by default, in order to add the
         validation the field can't be overridden in Serializer or it breaks.
@@ -103,9 +94,37 @@ class ItemSerializer(serializers.ModelSerializer):
         return attrs
 
     # Override
+    def to_representation(self, instance):
+        """
+        Overriding to handle MeasurementFields independently since the
+        value is exposed in different way (an object instead of the number).
+
+        unit is a custom field that needs to get data from volume or weight.
+
+        """
+        measurement_fields = [
+            item for item in self._readable_fields
+            if item.field_name in ["volume", "weight"]]
+
+        self._readable_fields = [
+            item for item in self._readable_fields
+            if item.field_name not in ["volume", "weight"]]
+        ret = super().to_representation(instance)
+
+        for field in measurement_fields:
+            attr = field.get_attribute(instance)
+            ret[field.field_name] = float(attr.value) if attr else None
+
+        ret["unit"] = (instance.volume.unit
+                       if instance.volume
+                       else instance.weight.unit)
+
+        return ret
+
+    # Override
     def create(self, validated_data):
         """ Overriding to handle meassurement units. """
-        unit = validated_data.pop("unit")
+        unit = validated_data.pop("unit", None)
         volume = validated_data.get("volume")
         weight = validated_data.get("weight")
         if volume:
@@ -120,7 +139,7 @@ class ItemSerializer(serializers.ModelSerializer):
     # Override
     def update(self, instance, validated_data):
         """ Overriding to handle meassurement units. """
-        unit = validated_data.get("unit")
+        unit = validated_data.get("unit", None)
         volume = (validated_data.get("volume") or
                   instance.volume.value if instance.volume else None)
         weight = (validated_data.get("weight") or
