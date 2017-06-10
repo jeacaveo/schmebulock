@@ -17,6 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 from rest_framework import routers
+from rest_framework_swagger.views import get_swagger_view
 
 from items import views as item_views
 
@@ -28,7 +29,9 @@ ROUTER.register(r"orders", item_views.OrderViewSet)
 ROUTER.register(r"items", item_views.ItemViewSet)
 ROUTER.register(r"purchases", item_views.PurchaseViewSet)
 
+
 urlpatterns = [
     url(r"^admin/", admin.site.urls),
     url(r"^api/", include(ROUTER.urls)),
+    url(r'^api/docs/', get_swagger_view(title='Schmebulock API'))
 ]

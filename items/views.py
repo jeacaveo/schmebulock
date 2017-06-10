@@ -19,7 +19,14 @@ class StoreViewSet(viewsets.ModelViewSet):
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    """ Endpoint for Order. """
+    """
+    Endpoint for Orders.
+
+    GET parameters:
+
+        'nested' (boolean): get detailed information on foreign key fields.
+
+    """
     queryset = models.Order.objects.all()
     serializer_class = serializers.OrderSerializer
 
@@ -38,7 +45,14 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 class ItemViewSet(viewsets.ModelViewSet):
-    """ Endpoint for Item. """
+    """
+    Endpoint for Items.
+
+    GET parameters:
+
+        'nested' (boolean): get detailed information on foreign key fields.
+
+    """
     queryset = models.Item.objects.all()
     serializer_class = serializers.ItemSerializer
 
@@ -57,7 +71,14 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
 class PurchaseViewSet(viewsets.ModelViewSet):
-    """ Endpoint for Purchase. """
+    """
+    Endpoint for Purchase.
+
+    GET parameters:
+
+        'nested' (boolean): get detailed information on foreign key fields.
+
+    """
     queryset = models.Purchase.objects.all()
     serializer_class = serializers.PurchaseSerializer
 
