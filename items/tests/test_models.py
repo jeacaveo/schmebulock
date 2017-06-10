@@ -1,7 +1,6 @@
 """ Test for all models of items app. """
 from django.test import TestCase
 
-from djmoney.models.fields import MoneyPatched
 from measurement.measures import Weight
 from model_mommy import mommy
 
@@ -112,20 +111,18 @@ class ItemModelTest(TestCase):
         # When
         item = mommy.make("Item",
                           name="Blue Cheese",
-                          price=MoneyPatched(50, 'DOP'),
                           weight=Weight(kg=0.500),
                           brand__name="Generic",)
 
         # Then
         self.assertEqual(
             str(item),
-            "Blue Cheese (Generic), 0.5 kg at 50.00 DOP")
+            "Blue Cheese (Generic), 0.5 kg")
 
     def test_fields(self):
         """ Test fields for model. """
         # Given
-        expected_fields = ["id", "name", "price_currency", "price",
-                           "volume", "weight", "brand", "order"]
+        expected_fields = ["id", "name", "volume", "weight", "brand", "order"]
 
         # When
         item = mommy.make("Item")

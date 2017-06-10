@@ -87,14 +87,12 @@ class ItemSerializerTest(TestCase):
         """ Test fields for serializer. """
         # Given
         item = mommy.make("Item",
-                          price=10,
                           volume=Volume(l=1),  # noqa
                           weight=Weight(g=1))
         item.refresh_from_db()  # To trigger MeasurementField updates
         expected_data = {
-            "id": item.id, "name": item.name, "price": "10.000",
-            "currency": item.price_currency, "unit": self.default_volume_unit,
-            "volume": 0.001, "weight": 1,
+            "id": item.id, "name": item.name,
+            "unit": self.default_volume_unit, "volume": 0.001, "weight": 1,
             "brand": item.brand.id, "order": item.order.id}
 
         # When
@@ -119,32 +117,14 @@ class ItemSerializerTest(TestCase):
         # Then
         self.assertEqual(serializer.errors, expected_data)
 
-    def test_errors_no_price(self):
-        """ Test errors when price is not provided. """
-        # Given
-        brand = mommy.make("Brand")
-        order = mommy.make("Order")
-        expected_data = {"price": ["This field is required."]}
-        data = {"name": "Item X", "unit": self.default_weight_unit,
-                "brand": brand.id, "order": order.id}
-
-        # When
-        serializer = ItemSerializer(data=data)
-        serializer.is_valid()
-
-        # Then
-        self.assertEqual(serializer.errors, expected_data)
-
     def test_errors_null(self):
         """ Test errors when required fields are null. """
         # Given
         expected_data = {"name": ["This field may not be null."],
-                         "price": ["This field may not be null."],
                          "unit": ["This field may not be null."],
                          "brand": ["This field may not be null."],
                          "order": ["This field may not be null."]}
-        data = {"name": None, "price": None, "unit": None,
-                "brand": None, "order": None}
+        data = {"name": None, "unit": None, "brand": None, "order": None}
 
         # When
         serializer = ItemSerializer(data=data)
@@ -165,7 +145,7 @@ class ItemSerializerTest(TestCase):
                                     "'weight' is not available."],
                          "weight": ["This field is required if "
                                     "'volume' is not available."]}
-        data = {"name": "Item X", "price": 10,
+        data = {"name": "Item X",
                 "unit": self.default_weight_unit,
                 "brand": brand.id, "order": order.id}
 
@@ -184,9 +164,8 @@ class ItemSerializerTest(TestCase):
         expected_data = {
             "non_field_errors": ["Either 'volume' or 'weight' must be "
                                  "provided, not both."]}
-        data = {"name": "Item X", "price": 10,
-                "unit": self.default_weight_unit,
-                "volume": 100, "weight": 100,
+        data = {"name": "Item X",
+                "unit": self.default_weight_unit, "volume": 100, "weight": 100,
                 "brand": brand.id, "order": order.id}
 
         # When
@@ -203,8 +182,8 @@ class ItemSerializerTest(TestCase):
         order = mommy.make("Order")
         expected_data = {
             "unit": ["'invalid_unit' is an invalid unit for volume field."]}
-        data = {"name": "Item X", "price": 10, "volume": 100,
-                "unit": "invalid_unit", "brand": brand.id, "order": order.id}
+        data = {"name": "Item X", "unit": "invalid_unit", "volume": 100,
+                "brand": brand.id, "order": order.id}
 
         # When
         serializer = ItemSerializer(data=data)
@@ -220,8 +199,8 @@ class ItemSerializerTest(TestCase):
         order = mommy.make("Order")
         expected_data = {
             "unit": ["'invalid_unit' is an invalid unit for weight field."]}
-        data = {"name": "Item X", "price": 10, "weight": 100,
-                "unit": "invalid_unit", "brand": brand.id, "order": order.id}
+        data = {"name": "Item X", "unit": "invalid_unit", "weight": 100,
+                "brand": brand.id, "order": order.id}
 
         # When
         serializer = ItemSerializer(data=data)
@@ -235,8 +214,8 @@ class ItemSerializerTest(TestCase):
         # Given
         brand = mommy.make("Brand")
         order = mommy.make("Order")
-        data = {"name": "Item X", "price": 10, "volume": 100,
-                "unit": self.default_volume_unit,
+        data = {"name": "Item X",
+                "unit": self.default_volume_unit, "volume": 100,
                 "brand": brand.id, "order": order.id}
 
         # When
@@ -246,8 +225,6 @@ class ItemSerializerTest(TestCase):
 
         # Then
         obj.refresh_from_db()
-        self.assertEqual(str(obj.price.amount), "10.000")
-        self.assertEqual(obj.price_currency, "USD")
         self.assertEqual(obj.volume.unit, self.default_volume_unit)
         self.assertEqual(obj.volume.value, 100.0)
         self.assertEqual(obj.volume.standard, 100.0)
@@ -265,8 +242,9 @@ class ItemSerializerTest(TestCase):
         expected_value = 0.1
         brand = mommy.make("Brand")
         order = mommy.make("Order")
-        data = {"name": "Item X", "price": 10, "volume": 100,
-                "unit": "l", "brand": brand.id, "order": order.id}
+        data = {"name": "Item X",
+                "unit": "l", "volume": 100,
+                "brand": brand.id, "order": order.id}
 
         # When
         serializer = ItemSerializer(data=data)
@@ -275,8 +253,6 @@ class ItemSerializerTest(TestCase):
 
         # Then
         obj.refresh_from_db()
-        self.assertEqual(str(obj.price.amount), "10.000")
-        self.assertEqual(obj.price_currency, "USD")
         self.assertEqual(obj.volume.l, 100.0)
         self.assertEqual(obj.volume.unit, self.default_volume_unit)
         self.assertEqual(obj.volume.value, expected_value)
@@ -290,8 +266,8 @@ class ItemSerializerTest(TestCase):
         # Given
         brand = mommy.make("Brand")
         order = mommy.make("Order")
-        data = {"name": "Item X", "price": 10, "weight": 100,
-                "unit": self.default_weight_unit,
+        data = {"name": "Item X",
+                "unit": self.default_weight_unit, "weight": 100,
                 "brand": brand.id, "order": order.id}
 
         # When
@@ -301,8 +277,6 @@ class ItemSerializerTest(TestCase):
 
         # Then
         obj.refresh_from_db()
-        self.assertEqual(str(obj.price.amount), "10.000")
-        self.assertEqual(obj.price_currency, "USD")
         self.assertEqual(obj.weight.unit, self.default_weight_unit)
         self.assertEqual(obj.weight.value, 100.0)
         self.assertEqual(obj.weight.standard, 100.0)
@@ -320,8 +294,9 @@ class ItemSerializerTest(TestCase):
         expected_value = 2834.95
         brand = mommy.make("Brand")
         order = mommy.make("Order")
-        data = {"name": "Item X", "price": 10, "weight": 100,
-                "unit": "oz", "brand": brand.id, "order": order.id}
+        data = {"name": "Item X",
+                "unit": "oz", "weight": 100,
+                "brand": brand.id, "order": order.id}
 
         # When
         serializer = ItemSerializer(data=data)
@@ -330,8 +305,6 @@ class ItemSerializerTest(TestCase):
 
         # Then
         obj.refresh_from_db()
-        self.assertEqual(str(obj.price.amount), "10.000")
-        self.assertEqual(obj.price_currency, "USD")
         self.assertEqual(obj.weight.oz, 100)
         self.assertEqual(obj.weight.unit, self.default_weight_unit)
         self.assertEqual(obj.weight.value, expected_value)
@@ -342,7 +315,7 @@ class ItemSerializerTest(TestCase):
 
     def test_update_standard_field(self):
         """
-        Test successful update when updating a fields that's not price,
+        Test successful update when updating a fields that's not
         volume or weight.
 
         """
@@ -436,30 +409,6 @@ class ItemSerializerTest(TestCase):
         self.assertEqual(item.weight.standard, expected_standard_value)
         self.assertEqual(item.weight.g, expected_standard_value)
 
-    def test_save_another_currency(self):
-        """ Test successful save when currency different than default one. """
-        # Given
-        brand = mommy.make("Brand")
-        order = mommy.make("Order")
-        data = {"name": "Item X", "price": 10, "volume": 100,
-                "unit": self.default_volume_unit, "currency": "DOP",
-                "brand": brand.id, "order": order.id}
-
-        # When
-        serializer = ItemSerializer(data=data)
-        serializer.is_valid()
-        obj = serializer.save()
-
-        # Then
-        data = serializer.data
-        obj.refresh_from_db()
-        self.assertEqual(obj.price_currency, "DOP")
-        self.assertEqual(data.get("price"), "10.000")
-        self.assertEqual(data.get("currency"), "DOP")
-        self.assertEqual(data.get("unit"), self.default_volume_unit)
-        self.assertEqual(data.get("brand"), brand.id)
-        self.assertEqual(data.get("order"), order.id)
-
 
 class ItemNestedSerializerTest(TestCase):
     """ Tests for nested Item serializer. """
@@ -468,13 +417,11 @@ class ItemNestedSerializerTest(TestCase):
         """ Test fields for serializer. """
         # Given
         item = mommy.make("Item",
-                          price=10,
                           volume=Volume(l=1))  # noqa
         item.refresh_from_db()  # To trigger MeasurementField updates
         expected_data = {
-            "id": item.id, "name": item.name, "price": "10.000",
-            "currency": item.price_currency, "unit": "cubic_meter",
-            "volume": 0.001, "weight": None,
+            "id": item.id, "name": item.name,
+            "unit": "cubic_meter", "volume": 0.001, "weight": None,
             "brand": {"id": item.brand.id, "name": item.brand.name},
             "order": {"id": item.order.id, "date": item.order.date.isoformat(),
                       "store": {"id": item.order.store.id,

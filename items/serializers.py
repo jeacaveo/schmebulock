@@ -46,28 +46,19 @@ class OrderNestedSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     """ Serializer for Item model. """
-    currency = serializers.CharField(source="price_currency", required=False)
     unit = serializers.CharField(max_length=32, required=True, write_only=True)
 
     class Meta:
         """ Meta data for serializer. """
         model = Item
-        fields = ("id", "name", "price", "currency", "unit",
-                  "volume", "weight", "brand", "order")
+        fields = ("id", "name", "unit", "volume", "weight", "brand", "order")
 
     # Override
     def validate(self, attrs):
         """
         Custom validations for MoneyField and MeasurementField.
 
-        price field is marked as not required by default, in order to add the
-        validation the field can't be overridden in Serializer or it breaks.
-
         """
-        if not attrs.get("price"):
-            raise serializers.ValidationError(
-                {"price": "This field is required."})
-
         volume = attrs.get("volume")
         weight = attrs.get("weight")
         if not volume and not weight:
@@ -177,7 +168,6 @@ class ItemSerializer(serializers.ModelSerializer):
 class ItemNestedSerializer(serializers.ModelSerializer):
     """ Serializer for nested Item model. """
 
-    currency = serializers.CharField(source="price_currency", required=False)
     unit = serializers.SerializerMethodField()
     volume = serializers.FloatField(source="volume.value")
     weight = serializers.FloatField(source="weight.value")
@@ -187,8 +177,7 @@ class ItemNestedSerializer(serializers.ModelSerializer):
     class Meta:
         """ Meta data for serializer. """
         model = Item
-        fields = ("id", "name", "price", "currency", "unit",
-                  "volume", "weight", "brand", "order")
+        fields = ("id", "name", "unit", "volume", "weight", "brand", "order")
 
     def get_unit(self, obj):
         """ Custom field that needs to get data from volume or weight. """

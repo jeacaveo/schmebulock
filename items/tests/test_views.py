@@ -153,11 +153,9 @@ class ItemEndpointTests(APITestCase):
     def test_get_list(self):
         """ Test GET list/all expected results when data available. """
         # Given
-        item = mommy.make("Item", price=10)
+        item = mommy.make("Item")
         expected_data = {"id": item.id,
                          "name": item.name,
-                         "price": "10.000",
-                         "currency": "USD",
                          "unit": None,
                          "volume": None,
                          "weight": None,
@@ -177,12 +175,10 @@ class ItemEndpointTests(APITestCase):
     def test_get_detail_nested(self):
         """ Test GET detail nested returns nested data. """
         # Given
-        item = mommy.make("Item", price=10)
+        item = mommy.make("Item")
         expected_data = {
             "id": item.id,
             "name": item.name,
-            "price": "10.000",
-            "currency": "USD",
             "unit": None,
             "volume": None,
             "weight": None,
