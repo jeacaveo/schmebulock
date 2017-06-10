@@ -1,6 +1,7 @@
 """ Test for all models of items app. """
 from django.test import TestCase
 
+from djmoney.models.fields import MoneyPatched
 from measurement.measures import Weight
 from model_mommy import mommy
 
@@ -129,3 +130,48 @@ class ItemModelTest(TestCase):
 
         # Then
         self.assertEqual(get_model_fields(item), expected_fields)
+
+
+class PurchaseModelTest(TestCase):
+    """ Tests for Purchase model. """
+
+    def test_string_representation(self):
+        """ Test string representation. """
+        # When
+        purchase = mommy.make("Purchase",
+                              price=MoneyPatched(50, "DOP"),
+                              item__name="Blue Cheese",
+                              item__weight=Weight(kg=0.500),
+                              item__brand__name="Generic",
+                              order__id=999)
+
+        # Then
+        self.assertEqual(
+            str(purchase),
+            "Blue Cheese (Generic), 0.5 kg at 50.00 DOP - #999")
+
+    def test_string_repr_no_order(self):
+        """ Test string representation when order is empty. """
+        # When
+        purchase = mommy.make("Purchase",
+                              price=MoneyPatched(50, "DOP"),
+                              item__name="Blue Cheese",
+                              item__weight=Weight(kg=0.500),
+                              item__brand__name="Generic",
+                              order=None)
+
+        # Then
+        self.assertEqual(
+            str(purchase),
+            "Blue Cheese (Generic), 0.5 kg at 50.00 DOP - #N/A")
+
+    def test_fields(self):
+        """ Test fields for model. """
+        # Given
+        expected_fields = ["id", "price_currency", "price", "item", "order"]
+
+        # When
+        purchase = mommy.make("Purchase")
+
+        # Then
+        self.assertEqual(get_model_fields(purchase), expected_fields)

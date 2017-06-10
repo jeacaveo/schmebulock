@@ -2,6 +2,7 @@
 from django.db import models
 
 from django_measurement.models import MeasurementField
+from djmoney.models.fields import MoneyField
 from measurement.measures import Volume, Weight
 
 
@@ -50,6 +51,21 @@ class Item(models.Model):
     def __str__(self):
         """ String representation for model. """
         return "{0} ({1}), {2}".format(
-            self.name,
-            self.brand.name,
-            self.volume or self.weight)
+            self.name, self.brand.name, self.volume or self.weight)
+
+
+class Purchase(models.Model):
+    """
+    Representation of the purchase of an item (with an order if available):
+        Blue Cheese (Generic), 0.5 kg at 50.00 DOP - #1
+        Bacon (XXX), 1.0 lb at 1.00 USD - #N/A
+
+    """
+    price = MoneyField(max_digits=15, decimal_places=3, default_currency="USD")
+    item = models.ForeignKey(Item)
+    order = models.ForeignKey(Order, null=True, blank=True)
+
+    def __str__(self):
+        """ String representation for model. """
+        return "{0} at {1} - #{2}".format(
+            self.item, self.price, self.order.id if self.order else "N/A")

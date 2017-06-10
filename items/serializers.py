@@ -3,7 +3,7 @@ from measurement.measures import Volume, Weight
 from rest_framework import serializers
 
 
-from .models import Brand, Order, Store, Item
+from .models import Brand, Item, Order, Purchase, Store
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -56,7 +56,7 @@ class ItemSerializer(serializers.ModelSerializer):
     # Override
     def validate(self, attrs):
         """
-        Custom validations for MoneyField and MeasurementField.
+        Custom validations for MeasurementField.
 
         """
         volume = attrs.get("volume")
@@ -184,3 +184,41 @@ class ItemNestedSerializer(serializers.ModelSerializer):
         # both empty, doing last line of validations.
         return (obj.volume.unit if obj.volume
                 else obj.weight.unit if obj.weight else None)
+
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    """ Serializer for Purchase model. """
+    currency = serializers.CharField(source="price_currency", required=False)
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = Purchase
+        fields = ("id", "price", "currency", "item", "order")
+
+    # Override
+    def validate(self, attrs):
+        """
+        Custom validations for MoneyField.
+
+        price field is marked as not required by default, in order to add the
+        validation the field can't be overridden in Serializer or it breaks.
+
+        """
+        if not attrs.get("price"):
+            raise serializers.ValidationError(
+                {"price": "This field is required."})
+
+        return attrs
+
+
+class PurchaseNestedSerializer(serializers.ModelSerializer):
+    """ Serializer for nested Item model. """
+
+    currency = serializers.CharField(source="price_currency", required=False)
+    item = ItemNestedSerializer()
+    order = OrderNestedSerializer()
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = Purchase
+        fields = ("id", "price", "currency", "item", "order")

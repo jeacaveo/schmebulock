@@ -191,3 +191,66 @@ class ItemEndpointTests(APITestCase):
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), expected_data)
+
+
+class PurchaseEndpointTests(APITestCase):
+    """ Test Purchse endpoint.  """
+
+    endpoint_name = "purchase"
+
+    def test_get_list_empty(self):
+        """ Test GET list/all returns expected when no data available. """
+        # Given
+        expected_data = []
+        url = reverse("{}-list".format(self.endpoint_name))
+
+        # When
+        response = self.client.get(url)
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), expected_data)
+
+    def test_get_list(self):
+        """ Test GET list/all expected results when data available. """
+        # Given
+        purchase = mommy.make("Purchase", price=10)
+        expected_data = {"id": purchase.id,
+                         "price": "10.000",
+                         "currency": "USD",
+                         "item": purchase.item.id,
+                         "order": None}
+        url = reverse("{}-list".format(self.endpoint_name))
+
+        # When
+        response = self.client.get(url)
+        data = response.json()
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0], expected_data)
+
+    def test_get_detail_nested(self):
+        """ Test GET detail nested returns nested data. """
+        # Given
+        order = mommy.make("Order")
+        purchase = mommy.make("Purchase", price=10, order=order)
+        expected_data = {
+            "id": purchase.id, "price": "10.000", "currency": "USD",
+            "item": {"id": purchase.item.id, "name": purchase.item.name,
+                     "unit": None, "volume": None, "weight": None,
+                     "brand": {"id": purchase.item.brand.id,
+                               "name": purchase.item.brand.name}},
+            "order": {"id": order.id, "date": order.date.isoformat(),
+                      "store": {"id": order.store.id,
+                                "name": order.store.name}}}
+        url = reverse("{}-detail".format(self.endpoint_name),
+                      args=[purchase.id])
+
+        # When
+        response = self.client.get(url, data={"nested": True})
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), expected_data)
