@@ -1,0 +1,182 @@
+[
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Albertsons LLC"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Aldi"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Costco"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Ahold Delhaize"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Food Lion"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Hannaford"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Giant-Carlisle"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Giant-Landover"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Stop & Shop"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Martin's Food Markets"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Hy-Vee"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Kmart Super Center"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Kroger"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Schnucks"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "SpartanNash"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "SuperValu Inc."
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "SuperTarget"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Trader Joe's"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Walmart"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Whole Foods"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Nacional"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Bravo"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Pola"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "La Cadena"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Jumbo"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "La Anónima"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Carrefour"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Coto"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "DIA%"
+    }
+  },
+  {
+    "model": "items.Store",
+    "fields": {
+      "name": "Disco-Jumbo-Vea (Cencosud)"
+    }
+  }
+]

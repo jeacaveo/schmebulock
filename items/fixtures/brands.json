@@ -1,0 +1,302 @@
+[
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Tyson Foods Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"PepsiCo Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Nestle"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Coca-Cola Co."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Kraft Heinz Co."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"JBS USA *"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Anheuser-Busch InBev*"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Smithfield Foods Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"General Mills Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Conagra Brands Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Mars Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Kellogg Co."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"MillerCoors LLC"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Hormel Foods Corp."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Cargill Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Dean Foods Co."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"J.M. Smucker Co."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Saputo Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Pilgrim's Pride"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Mondelez International"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Bimbo Bakeries USA*"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Hershey Co."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Dr Pepper Snapple Group"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Campbell Soup Co."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Post Holdings"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Agropur Cooperative"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Perdue Farms Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Brown-Forman Corp."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Land O'Lakes Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Dairy Farmers of America"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"WhiteWave Foods"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Flowers Foods Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Unilever U.S. *"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"National Beef Packing Co."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"E&J Gallo Winery"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Constellation Brands"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"TreeHouse Foods Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Koch Foods Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Great Lakes Cheese Co."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Lactalis American/Parmalat North America"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Prairie Farms Dairy Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Beam Suntory Inc.*"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Sanderson Farms"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Rich Products Corp."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Foster Farms LLC"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Pinnacle Foods"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"McCain Foods"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"Maple Leaf Foods"
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"H.P. Hood Inc."
+    }
+  },
+  {
+    "model":"items.brand",
+    "fields":{
+      "name":"American Foods Group LLC"
+    }
+  }
+]
