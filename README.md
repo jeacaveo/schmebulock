@@ -25,12 +25,15 @@ Development being done in GitLab and GitHub (mirror) simultaneously.
 1. Clone this repo into your preferred directory:
 
     GitLab:
+
         git clone git@gitlab.com:jeacaveo/schmebulock.git
 
     GitHub:
+
         git clone git@github.com:jeacaveo/schmebulock.git
 
     Enter project root:
+
         cd schmebulock
 
 2. Configure database:
