@@ -123,35 +123,53 @@ class ItemSerializer(serializers.ModelSerializer):
 
         return ret
 
-    # Override
-    def create(self, validated_data):
-        """ Overriding to handle meassurement units. """
-        unit = validated_data.pop("unit", None)
-        volume = validated_data.get("volume")
-        weight = validated_data.get("weight")
+    def _set_volume_weight_fields(self, validated_data, unit, volume, weight):
+        """
+        Set volume or weight using django-measurement field.
+
+        Parameters:
+            validated_data: dict
+                Dict with validated data from serializer.
+            unit: str
+                Value for unit field
+            volume: float
+                Value for volume field
+            weight: float
+                Value for weight field
+
+        Returns:
+            dict, validated_data but with properly set volume/weight fields.
+
+        """
         if volume:
             validated_data["volume"] = Volume(
                 **{unit or "cubic_meter": volume})
         elif weight:
             validated_data["weight"] = Weight(
                 **{unit or "g": weight})
+        return validated_data
+
+    # Override
+    def create(self, validated_data):
+        """ Overriding to handle meassurement units. """
+        validated_data = self._set_volume_weight_fields(
+            validated_data,
+            validated_data.pop("unit", None),
+            validated_data.get("volume"),
+            validated_data.get("weight"))
 
         return super().create(validated_data)
 
     # Override
     def update(self, instance, validated_data):
         """ Overriding to handle meassurement units. """
-        unit = validated_data.get("unit", None)
-        volume = (validated_data.get("volume") or
-                  instance.volume.value if instance.volume else None)
-        weight = (validated_data.get("weight") or
-                  instance.weight.value if instance.weight else None)
-        if volume:
-            validated_data["volume"] = Volume(
-                **{unit or "cubic_meter": volume})
-        elif weight:
-            validated_data["weight"] = Weight(
-                **{unit or "g": weight})
+        validated_data = self._set_volume_weight_fields(
+            validated_data,
+            validated_data.pop("unit", None),
+            (validated_data.get("volume") or
+             instance.volume.value if instance.volume else None),
+            (validated_data.get("weight") or
+             instance.weight.value if instance.weight else None))
 
         return super().update(instance, validated_data)
 
