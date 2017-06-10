@@ -14,7 +14,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="item">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="168" y="272"/>
+	<position x="156" y="43"/>
 	<column name="id" not-null="true">
 		<type name="smallint"/>
 	</column>
@@ -33,9 +33,6 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="brand_id" not-null="true">
 		<type name="smallint"/>
 	</column>
-	<column name="order_id" not-null="true">
-		<type name="smallint"/>
-	</column>
 	<constraint name="item_id" type="pk-constr" table="public.item">
 		<columns names="id" ref-type="src-columns"/>
 	</constraint>
@@ -44,7 +41,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="brand">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="200" y="73"/>
+	<position x="517" y="108"/>
 	<column name="id" not-null="true">
 		<type name="smallint"/>
 	</column>
@@ -59,7 +56,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="store">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="574" y="495"/>
+	<position x="545" y="445"/>
 	<column name="id" not-null="true">
 		<type name="smallint"/>
 	</column>
@@ -74,7 +71,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="order">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="573" y="351"/>
+	<position x="545" y="287"/>
 	<column name="id" not-null="true">
 		<type name="smallint"/>
 	</column>
@@ -89,21 +86,51 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	</constraint>
 </table>
 
+<table name="purchase">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="155" y="235"/>
+	<column name="id" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<column name="price" not-null="true">
+		<type name="float"/>
+	</column>
+	<column name="price_currency" not-null="true">
+		<type name="varchar"/>
+	</column>
+	<column name="item_id" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<column name="order_id">
+		<type name="smallint"/>
+	</column>
+	<constraint name="purchase_id" type="pk-constr" table="public.purchase">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
 <constraint name="item_brand_id" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.brand" table="public.item">
 	<columns names="brand_id" ref-type="src-columns"/>
 	<columns names="id" ref-type="dst-columns"/>
 </constraint>
 
-<constraint name="item_order_id" type="fk-constr" comparison-type="MATCH FULL"
-	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;order&quot;" table="public.item">
-	<columns names="order_id" ref-type="src-columns"/>
-	<columns names="id" ref-type="dst-columns"/>
-</constraint>
-
 <constraint name="order_store_id" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.store" table="public.&quot;order&quot;">
 	<columns names="store_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="purchase_item_id" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.item" table="public.purchase">
+	<columns names="item_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="purchase_order_id" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;order&quot;" table="public.purchase">
+	<columns names="order_id" ref-type="src-columns"/>
 	<columns names="id" ref-type="dst-columns"/>
 </constraint>
 
@@ -117,8 +144,13 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	 dst-table="public.store"
 	 src-required="false" dst-required="false"/>
 
-<relationship name="rel_item_order" type="relfk"
-	 src-table="public.item"
+<relationship name="rel_purchase_item" type="relfk"
+	 src-table="public.purchase"
+	 dst-table="public.item"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_purchase_order" type="relfk"
+	 src-table="public.purchase"
 	 dst-table="public.&quot;order&quot;"
 	 src-required="false" dst-required="false"/>
 
