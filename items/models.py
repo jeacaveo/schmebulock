@@ -46,7 +46,6 @@ class Item(models.Model):
     weight = MeasurementField(measurement=Weight, null=True, blank=True,
                               help_text="Unit in DB is always grams")
     brand = models.ForeignKey(Brand)
-    order = models.ForeignKey(Order)
 
     def __str__(self):
         """ String representation for model. """

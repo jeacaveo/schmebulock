@@ -159,8 +159,7 @@ class ItemEndpointTests(APITestCase):
                          "unit": None,
                          "volume": None,
                          "weight": None,
-                         "brand": item.brand.id,
-                         "order": item.order.id}
+                         "brand": item.brand.id}
         url = reverse("{}-list".format(self.endpoint_name))
 
         # When
@@ -182,11 +181,7 @@ class ItemEndpointTests(APITestCase):
             "unit": None,
             "volume": None,
             "weight": None,
-            "brand": {"id": item.brand.id, "name": item.brand.name},
-            "order": {"id": item.order.id,
-                      "date": item.order.date.isoformat(),
-                      "store": {"id": item.order.store.id,
-                                "name": item.order.store.name}}}
+            "brand": {"id": item.brand.id, "name": item.brand.name}}
         url = reverse("{}-detail".format(self.endpoint_name),
                       args=[item.id])
 

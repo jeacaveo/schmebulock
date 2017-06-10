@@ -122,7 +122,7 @@ class ItemModelTest(TestCase):
     def test_fields(self):
         """ Test fields for model. """
         # Given
-        expected_fields = ["id", "name", "volume", "weight", "brand", "order"]
+        expected_fields = ["id", "name", "volume", "weight", "brand"]
 
         # When
         item = mommy.make("Item")

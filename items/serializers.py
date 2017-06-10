@@ -51,7 +51,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         """ Meta data for serializer. """
         model = Item
-        fields = ("id", "name", "unit", "volume", "weight", "brand", "order")
+        fields = ("id", "name", "unit", "volume", "weight", "brand")
 
     # Override
     def validate(self, attrs):
@@ -172,12 +172,11 @@ class ItemNestedSerializer(serializers.ModelSerializer):
     volume = serializers.FloatField(source="volume.value")
     weight = serializers.FloatField(source="weight.value")
     brand = StoreSerializer()
-    order = OrderNestedSerializer()
 
     class Meta:
         """ Meta data for serializer. """
         model = Item
-        fields = ("id", "name", "unit", "volume", "weight", "brand", "order")
+        fields = ("id", "name", "unit", "volume", "weight", "brand")
 
     def get_unit(self, obj):
         """ Custom field that needs to get data from volume or weight. """
