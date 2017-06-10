@@ -519,8 +519,23 @@ class PurchaseSerializerTest(TestCase):
         self.assertEqual(data.get("currency"), "DOP")
         self.assertEqual(data.get("item"), item.id)
 
+    def test_errors_invalid_currency(self):
+        """ Test error when invalid currency is provided. """
+        # Given
+        item = mommy.make("item")
+        expected_data = {
+            "currency": ["'invalid_currency' is an invalid currency code."]}
+        data = {"price": 10, "currency": "invalid_currency", "item": item.id}
 
-class PurchsaeNestedSerializerTest(TestCase):
+        # When
+        serializer = PurchaseSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+
+class PurchaseNestedSerializerTest(TestCase):
     """ Tests for nested Purchase serializer. """
 
     def test_fields(self):

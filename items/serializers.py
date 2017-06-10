@@ -1,4 +1,5 @@
 """ Serializers of items app. """
+from djmoney import settings as djmoney_settings
 from measurement.measures import Volume, Weight
 from rest_framework import serializers
 
@@ -194,6 +195,13 @@ class PurchaseSerializer(serializers.ModelSerializer):
         """ Meta data for serializer. """
         model = Purchase
         fields = ("id", "price", "currency", "item", "order")
+
+    def validate_currency(self, value):
+        """ Validate currency to avoid non-Django raised exception. """
+        if value not in dict(djmoney_settings.CURRENCY_CHOICES).keys():
+            raise serializers.ValidationError(
+                "'{}' is an invalid currency code.".format(value))
+        return value
 
     # Override
     def validate(self, attrs):
