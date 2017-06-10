@@ -6,14 +6,11 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from .. import models
-
 
 class BrandEndpointTests(APITestCase):
     """ Test Brand endpoint.  """
 
     endpoint_name = "brand"
-    model = models.Brand
 
     def test_get_list_empty(self):
         """ Test GET list/all returns expected when no data available. """
@@ -49,7 +46,6 @@ class StoreEndpointTests(APITestCase):
     """ Test Store endpoint.  """
 
     endpoint_name = "store"
-    model = models.Store
 
     def test_get_list_empty(self):
         """ Test GET list/all returns expected when no data available. """
@@ -85,7 +81,6 @@ class OrderEndpointTests(APITestCase):
     """ Test Order endpoint.  """
 
     endpoint_name = "order"
-    model = models.Order
 
     def test_get_list_empty(self):
         """ Test GET list/all returns expected when no data available. """
@@ -128,6 +123,76 @@ class OrderEndpointTests(APITestCase):
                                    "name": order.store.name}}
         url = reverse("{}-detail".format(self.endpoint_name),
                       args=[order.id])
+
+        # When
+        response = self.client.get(url, data={"nested": True})
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), expected_data)
+
+
+class ItemEndpointTests(APITestCase):
+    """ Test Item endpoint.  """
+
+    endpoint_name = "item"
+
+    def test_get_list_empty(self):
+        """ Test GET list/all returns expected when no data available. """
+        # Given
+        expected_data = []
+        url = reverse("{}-list".format(self.endpoint_name))
+
+        # When
+        response = self.client.get(url)
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), expected_data)
+
+    def test_get_list(self):
+        """ Test GET list/all expected results when data available. """
+        # Given
+        item = mommy.make("Item", price=10)
+        expected_data = {"id": item.id,
+                         "name": item.name,
+                         "price": "10.000",
+                         "currency": "USD",
+                         "unit": None,
+                         "volume": None,
+                         "weight": None,
+                         "brand": item.brand.id,
+                         "order": item.order.id}
+        url = reverse("{}-list".format(self.endpoint_name))
+
+        # When
+        response = self.client.get(url)
+        data = response.json()
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0], expected_data)
+
+    def test_get_detail_nested(self):
+        """ Test GET detail nested returns nested data. """
+        # Given
+        item = mommy.make("Item", price=10)
+        expected_data = {
+            "id": item.id,
+            "name": item.name,
+            "price": "10.000",
+            "currency": "USD",
+            "unit": None,
+            "volume": None,
+            "weight": None,
+            "brand": {"id": item.brand.id, "name": item.brand.name},
+            "order": {"id": item.order.id,
+                      "date": item.order.date.isoformat(),
+                      "store": {"id": item.order.store.id,
+                                "name": item.order.store.name}}}
+        url = reverse("{}-detail".format(self.endpoint_name),
+                      args=[item.id])
 
         # When
         response = self.client.get(url, data={"nested": True})

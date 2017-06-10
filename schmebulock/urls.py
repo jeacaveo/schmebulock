@@ -25,6 +25,7 @@ ROUTER = routers.DefaultRouter()
 ROUTER.register(r"brands", item_views.BrandViewSet)
 ROUTER.register(r"stores", item_views.StoreViewSet)
 ROUTER.register(r"orders", item_views.OrderViewSet)
+ROUTER.register(r"items", item_views.ItemViewSet)
 
 urlpatterns = [
     url(r"^admin/", admin.site.urls),

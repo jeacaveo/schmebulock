@@ -34,4 +34,23 @@ class OrderViewSet(viewsets.ModelViewSet):
         if (self.request.method == "GET" and
                 self.request.query_params.get("nested")):
             return serializers.OrderNestedSerializer
-        return serializers.OrderSerializer
+        return super().get_serializer_class()
+
+
+class ItemViewSet(viewsets.ModelViewSet):
+    """ Endpoint for Item. """
+    queryset = models.Item.objects.all()
+    serializer_class = serializers.ItemSerializer
+
+    # Override
+    def get_serializer_class(self):
+        """
+        Override!
+
+        Using custom nested serializer when requested.
+
+        """
+        if (self.request.method == "GET" and
+                self.request.query_params.get("nested")):
+            return serializers.ItemNestedSerializer
+        return super().get_serializer_class()

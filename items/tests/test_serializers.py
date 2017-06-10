@@ -87,7 +87,9 @@ class ItemSerializerTest(TestCase):
         """ Test fields for serializer. """
         # Given
         item = mommy.make("Item",
-                          price=10, volume=Volume(l=1), weight=Weight(g=1))
+                          price=10,
+                          volume=Volume(l=1),  # noqa
+                          weight=Weight(g=1))
         item.refresh_from_db()  # To trigger MeasurementField updates
         expected_data = {
             "id": item.id, "name": item.name, "price": "10.000",
@@ -152,7 +154,10 @@ class ItemSerializerTest(TestCase):
         self.assertEqual(serializer.errors, expected_data)
 
     def test_errors_no_volume_weight(self):
-        """ Test errors when both volume and weight fields are not provided. """
+        """
+        Test errors when both volume and weight fields are not provided.
+
+        """
         # Given
         brand = mommy.make("Brand")
         order = mommy.make("Order")
@@ -286,7 +291,7 @@ class ItemSerializerTest(TestCase):
         brand = mommy.make("Brand")
         order = mommy.make("Order")
         data = {"name": "Item X", "price": 10, "weight": 100,
-                "unit":self.default_weight_unit,
+                "unit": self.default_weight_unit,
                 "brand": brand.id, "order": order.id}
 
         # When
@@ -462,7 +467,9 @@ class ItemNestedSerializerTest(TestCase):
     def test_fields(self):
         """ Test fields for serializer. """
         # Given
-        item = mommy.make("Item", price=10, volume=Volume(l=1))
+        item = mommy.make("Item",
+                          price=10,
+                          volume=Volume(l=1))  # noqa
         item.refresh_from_db()  # To trigger MeasurementField updates
         expected_data = {
             "id": item.id, "name": item.name, "price": "10.000",

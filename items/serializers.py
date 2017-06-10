@@ -115,9 +115,11 @@ class ItemSerializer(serializers.ModelSerializer):
             attr = field.get_attribute(instance)
             ret[field.field_name] = float(attr.value) if attr else None
 
+        # Volume or Weight must always be present, but in case they are
+        # both empty, doing last line of validations.
         ret["unit"] = (instance.volume.unit
                        if instance.volume
-                       else instance.weight.unit)
+                       else instance.weight.unit if instance.weight else None)
 
         return ret
 
@@ -172,4 +174,7 @@ class ItemNestedSerializer(serializers.ModelSerializer):
 
     def get_unit(self, obj):
         """ Custom field that needs to get data from volume or weight. """
-        return obj.volume.unit if obj.volume else obj.weight.unit
+        # Volume or Weight must always be present, but in case they are
+        # both empty, doing last line of validations.
+        return (obj.volume.unit if obj.volume
+                else obj.weight.unit if obj.weight else None)
