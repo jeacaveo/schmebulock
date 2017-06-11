@@ -16,6 +16,10 @@ class Brand(AuthStampedModel, TimeStampedModel, models.Model):
         """ String representation for model. """
         return self.name
 
+    class Meta:
+        """ Meta data for model. """
+        ordering = ['-created']
+
 
 class Store(AuthStampedModel, TimeStampedModel, models.Model):
     """ Representation of a store (IKEA, PricesMart, etc.). """
@@ -24,6 +28,10 @@ class Store(AuthStampedModel, TimeStampedModel, models.Model):
     def __str__(self):
         """ String representation for model. """
         return self.name
+
+    class Meta:
+        """ Meta data for model. """
+        ordering = ['-created']
 
 
 class Order(AuthStampedModel, TimeStampedModel, models.Model):
@@ -34,6 +42,10 @@ class Order(AuthStampedModel, TimeStampedModel, models.Model):
     def __str__(self):
         """ String representation for model. """
         return "{0} - {1}".format(self.store.name, self.date)
+
+    class Meta:
+        """ Meta data for model. """
+        ordering = ['-created']
 
 
 class Item(AuthStampedModel, TimeStampedModel, models.Model):
@@ -55,6 +67,10 @@ class Item(AuthStampedModel, TimeStampedModel, models.Model):
         return "{0} ({1}), {2}".format(
             self.name, self.brand.name, self.volume or self.weight)
 
+    class Meta:
+        """ Meta data for model. """
+        ordering = ['-created']
+
 
 class Purchase(AuthStampedModel, TimeStampedModel, models.Model):
     """
@@ -71,3 +87,7 @@ class Purchase(AuthStampedModel, TimeStampedModel, models.Model):
         """ String representation for model. """
         return "{0} at {1} - #{2}".format(
             self.item, self.price, self.order.id if self.order else "N/A")
+
+    class Meta:
+        """ Meta data for model. """
+        ordering = ['-created']

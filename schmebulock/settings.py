@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djmoney',
     'rest_framework_swagger',
+    'cities',
     'items',
 ]
 
@@ -85,7 +86,7 @@ WSGI_APPLICATION = 'schmebulock.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'schmebulock',
         'USER': 'schmebulock',
         'PASSWORD': 'schmebulock',
@@ -144,6 +145,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         ),
+    'DEFAULT_PAGINATION_CLASS':
+    'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100
     }
 
 JWT_AUTH = {
@@ -177,3 +181,5 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
     'JWT_AUTH_COOKIE': None,
 }
+
+CITIES_DATA_DIR = 'cities/data'

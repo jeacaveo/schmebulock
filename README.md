@@ -36,7 +36,7 @@ Development being done in GitLab and GitHub (mirror) simultaneously.
 
         cd schmebulock
 
-2. Configure database:
+2. Configure database (creating as superuser to allow creating extension):
 
         $ sudo su postgres
         $ psql
@@ -46,7 +46,9 @@ Development being done in GitLab and GitHub (mirror) simultaneously.
         # alter role schmebulock set default_transaction_isolation to 'read committed';
         # alter role schmebulock set timezone to 'UTC';
         # grant all privileges on database schmebulock to schmebulock;
-        # alter user schmebulock createdb;
+        # alter user schmebulock superuser;
+        # \c schmebulock
+        # create extension postgis
         # \q
         $ exit
 
@@ -57,6 +59,7 @@ Development being done in GitLab and GitHub (mirror) simultaneously.
 4. Run migrations:
 
         python manage.py migrate
+        python manage.py migrate cities
 
 5. Run tests without coverage (parameters in [] are optional):
 
@@ -71,12 +74,21 @@ Development being done in GitLab and GitHub (mirror) simultaneously.
         python manage.py createsuperuser
     (complete user creation process, suggestions: admin/admin123)
 
-8. Load initial data for stores and brands (optional, if run multiple times it will create duplicates):
+8. Load initial data for stores and brands (optional, if ran multiple times it will create duplicates):
 
         python manage.py loaddata stores
         python manage.py loaddata brands
 
-9. Run the server:
+9. Load city data (optional, not loading postal code or alternative name data):
+
+        mkdir -p cities/data
+        python manage.py cities --import=country
+        python manage.py cities --import=region
+        python manage.py cities --import=subregion
+        python manage.py cities --import=city
+        python manage.py cities --import=district
+
+10. Run the server:
 
         python manage.py runserver
 

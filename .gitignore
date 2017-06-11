@@ -69,3 +69,6 @@ target/
 media/
 static/
 storage/
+
+# Manually created directory for importing city data
+cities/

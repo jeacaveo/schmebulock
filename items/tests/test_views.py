@@ -51,7 +51,7 @@ class BrandEndpointTests(APITestCase):
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), expected_data)
+        self.assertEqual(response.json()["results"], expected_data)
 
     def test_get_list(self):
         """ Test GET list/all expected results when data available. """
@@ -63,7 +63,7 @@ class BrandEndpointTests(APITestCase):
 
         # When
         response = self.client.get(url)
-        data = response.json()
+        data = response.json()["results"]
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -94,7 +94,7 @@ class StoreEndpointTests(APITestCase):
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), expected_data)
+        self.assertEqual(response.json()["results"], expected_data)
 
     def test_get_list(self):
         """ Test GET list/all expected results when data available. """
@@ -106,7 +106,7 @@ class StoreEndpointTests(APITestCase):
 
         # When
         response = self.client.get(url)
-        data = response.json()
+        data = response.json()["results"]
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -137,7 +137,7 @@ class OrderEndpointTests(APITestCase):
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), expected_data)
+        self.assertEqual(response.json()["results"], expected_data)
 
     def test_get_list(self):
         """ Test GET list/all expected results when data available. """
@@ -150,7 +150,7 @@ class OrderEndpointTests(APITestCase):
 
         # When
         response = self.client.get(url)
-        data = response.json()
+        data = response.json()["results"]
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -199,7 +199,7 @@ class ItemEndpointTests(APITestCase):
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), expected_data)
+        self.assertEqual(response.json()["results"], expected_data)
 
     def test_get_list(self):
         """ Test GET list/all expected results when data available. """
@@ -215,7 +215,7 @@ class ItemEndpointTests(APITestCase):
 
         # When
         response = self.client.get(url)
-        data = response.json()
+        data = response.json()["results"]
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -267,7 +267,7 @@ class PurchaseEndpointTests(APITestCase):
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), expected_data)
+        self.assertEqual(response.json()["results"], expected_data)
 
     def test_get_list(self):
         """ Test GET list/all expected results when data available. """
@@ -282,7 +282,7 @@ class PurchaseEndpointTests(APITestCase):
 
         # When
         response = self.client.get(url)
-        data = response.json()
+        data = response.json()["results"]
 
         # Then
         self.assertEqual(response.status_code, status.HTTP_200_OK)
