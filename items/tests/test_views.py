@@ -4,13 +4,39 @@ from model_mommy import mommy
 
 from rest_framework import status
 from rest_framework.reverse import reverse
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient, APITestCase
+
+
+def get_authentication_token():
+    """
+    Get JWT token.
+
+    Returns:
+        string, JWT token.
+
+    """
+    password = "admin"
+    user = mommy.make("User", username="admin")
+    user.set_password(password)
+    user.save()
+    response = APIClient().post(
+        "/api/auth/token/",
+        {"username": user.username, "password": password},
+        format='json')
+    return response.data.get("token")
 
 
 class BrandEndpointTests(APITestCase):
     """ Test Brand endpoint.  """
 
     endpoint_name = "brand"
+
+    def setUp(self):
+        """ Setup for tests. """
+        self.client = APIClient()
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Bearer {0}".format(
+                get_authentication_token()))
 
     def test_get_list_empty(self):
         """ Test GET list/all returns expected when no data available. """
@@ -47,6 +73,13 @@ class StoreEndpointTests(APITestCase):
 
     endpoint_name = "store"
 
+    def setUp(self):
+        """ Setup for tests. """
+        self.client = APIClient()
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Bearer {0}".format(
+                get_authentication_token()))
+
     def test_get_list_empty(self):
         """ Test GET list/all returns expected when no data available. """
         # Given
@@ -81,6 +114,13 @@ class OrderEndpointTests(APITestCase):
     """ Test Order endpoint.  """
 
     endpoint_name = "order"
+
+    def setUp(self):
+        """ Setup for tests. """
+        self.client = APIClient()
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Bearer {0}".format(
+                get_authentication_token()))
 
     def test_get_list_empty(self):
         """ Test GET list/all returns expected when no data available. """
@@ -136,6 +176,13 @@ class ItemEndpointTests(APITestCase):
     """ Test Item endpoint.  """
 
     endpoint_name = "item"
+
+    def setUp(self):
+        """ Setup for tests. """
+        self.client = APIClient()
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Bearer {0}".format(
+                get_authentication_token()))
 
     def test_get_list_empty(self):
         """ Test GET list/all returns expected when no data available. """
@@ -197,6 +244,13 @@ class PurchaseEndpointTests(APITestCase):
     """ Test Purchse endpoint.  """
 
     endpoint_name = "purchase"
+
+    def setUp(self):
+        """ Setup for tests. """
+        self.client = APIClient()
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Bearer {0}".format(
+                get_authentication_token()))
 
     def test_get_list_empty(self):
         """ Test GET list/all returns expected when no data available. """
