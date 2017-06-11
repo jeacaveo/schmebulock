@@ -6,6 +6,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient, APITestCase
 
+from schmebulock.utils import get_default_fields
+
 
 def get_authentication_token():
     """
@@ -55,7 +57,8 @@ class BrandEndpointTests(APITestCase):
         """ Test GET list/all expected results when data available. """
         # Given
         brand = mommy.make("Brand")
-        expected_data = {"id": brand.id, "name": brand.name}
+        expected_data = get_default_fields(brand)
+        expected_data.update({"name": brand.name})
         url = reverse("{}-list".format(self.endpoint_name))
 
         # When
@@ -97,7 +100,8 @@ class StoreEndpointTests(APITestCase):
         """ Test GET list/all expected results when data available. """
         # Given
         store = mommy.make("Store")
-        expected_data = {"id": store.id, "name": store.name}
+        expected_data = get_default_fields(store)
+        expected_data.update({"name": store.name})
         url = reverse("{}-list".format(self.endpoint_name))
 
         # When
@@ -139,9 +143,9 @@ class OrderEndpointTests(APITestCase):
         """ Test GET list/all expected results when data available. """
         # Given
         order = mommy.make("Order")
-        expected_data = {"id": order.id,
-                         "date": order.date.isoformat(),
-                         "store": order.store.id}
+        expected_data = get_default_fields(order)
+        expected_data.update({"date": order.date.isoformat(),
+                              "store": order.store.id})
         url = reverse("{}-list".format(self.endpoint_name))
 
         # When
@@ -157,10 +161,10 @@ class OrderEndpointTests(APITestCase):
         """ Test GET detail nested returns nested data. """
         # Given
         order = mommy.make("Order")
-        expected_data = {"id": order.id,
-                         "date": order.date.isoformat(),
-                         "store": {"id": order.store.id,
-                                   "name": order.store.name}}
+        expected_data = get_default_fields(order)
+        expected_data.update({"date": order.date.isoformat(),
+                              "store": {"id": order.store.id,
+                                        "name": order.store.name}})
         url = reverse("{}-detail".format(self.endpoint_name),
                       args=[order.id])
 
@@ -201,12 +205,12 @@ class ItemEndpointTests(APITestCase):
         """ Test GET list/all expected results when data available. """
         # Given
         item = mommy.make("Item")
-        expected_data = {"id": item.id,
-                         "name": item.name,
-                         "unit": None,
-                         "volume": None,
-                         "weight": None,
-                         "brand": item.brand.id}
+        expected_data = get_default_fields(item)
+        expected_data.update({"name": item.name,
+                              "unit": None,
+                              "volume": None,
+                              "weight": None,
+                              "brand": item.brand.id})
         url = reverse("{}-list".format(self.endpoint_name))
 
         # When
@@ -222,13 +226,13 @@ class ItemEndpointTests(APITestCase):
         """ Test GET detail nested returns nested data. """
         # Given
         item = mommy.make("Item")
-        expected_data = {
-            "id": item.id,
+        expected_data = get_default_fields(item)
+        expected_data.update({
             "name": item.name,
             "unit": None,
             "volume": None,
             "weight": None,
-            "brand": {"id": item.brand.id, "name": item.brand.name}}
+            "brand": {"id": item.brand.id, "name": item.brand.name}})
         url = reverse("{}-detail".format(self.endpoint_name),
                       args=[item.id])
 
@@ -269,11 +273,11 @@ class PurchaseEndpointTests(APITestCase):
         """ Test GET list/all expected results when data available. """
         # Given
         purchase = mommy.make("Purchase", price=10)
-        expected_data = {"id": purchase.id,
-                         "price": "10.000",
-                         "currency": "USD",
-                         "item": purchase.item.id,
-                         "order": None}
+        expected_data = get_default_fields(purchase)
+        expected_data.update({"price": "10.000",
+                              "currency": "USD",
+                              "item": purchase.item.id,
+                              "order": None})
         url = reverse("{}-list".format(self.endpoint_name))
 
         # When
@@ -290,15 +294,16 @@ class PurchaseEndpointTests(APITestCase):
         # Given
         order = mommy.make("Order")
         purchase = mommy.make("Purchase", price=10, order=order)
-        expected_data = {
-            "id": purchase.id, "price": "10.000", "currency": "USD",
+        expected_data = get_default_fields(purchase)
+        expected_data.update({
+            "price": "10.000", "currency": "USD",
             "item": {"id": purchase.item.id, "name": purchase.item.name,
                      "unit": None, "volume": None, "weight": None,
                      "brand": {"id": purchase.item.brand.id,
                                "name": purchase.item.brand.name}},
             "order": {"id": order.id, "date": order.date.isoformat(),
                       "store": {"id": order.store.id,
-                                "name": order.store.name}}}
+                                "name": order.store.name}}})
         url = reverse("{}-detail".format(self.endpoint_name),
                       args=[purchase.id])
 

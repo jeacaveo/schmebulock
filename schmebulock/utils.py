@@ -45,3 +45,22 @@ def get_choices(data, first=None):
         data.move_to_end(first, last=False)
 
     return [(val, key) for key, val in data.items()]
+
+
+def get_default_fields(obj):
+    """
+    Get dict with all default fields for and endpoint.
+
+    Parameters:
+        obj: schmebulock.model
+            Instance of model.
+
+    Returns:
+        dict, with default fields populated by obj data.
+
+    """
+    return {"id": obj.id,
+            "created": obj.created.isoformat().replace('+00:00', 'Z'),
+            "created_by": obj.created_by,
+            "modified": obj.modified.isoformat().replace('+00:00', 'Z'),
+            "modified_by": obj.modified_by}

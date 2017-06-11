@@ -2,9 +2,11 @@
 from json import dumps, loads
 
 from django.test import TestCase
-from measurement.measures import Volume, Weight
 
+from measurement.measures import Volume, Weight
 from model_mommy import mommy
+
+from schmebulock.utils import get_default_fields
 
 from ..serializers import (
     BrandSerializer,
@@ -23,13 +25,15 @@ class BrandSerializerTest(TestCase):
     def test_fields(self):
         """ Test fields for serializer. """
         # Given
-        expected_data = {"name": ""}
+        brand = mommy.make("Brand")
+        expected_data = get_default_fields(brand)
+        expected_data.update({"name": brand.name})
 
         # When
-        serializer = BrandSerializer()
+        serializer = BrandSerializer(brand)
 
         # Then
-        self.assertEqual(serializer.data, expected_data)
+        self.assertEqual(loads(dumps(serializer.data)), expected_data)
 
 
 class StoreSerializerTest(TestCase):
@@ -38,13 +42,15 @@ class StoreSerializerTest(TestCase):
     def test_fields(self):
         """ Test fields for serializer. """
         # Given
-        expected_data = {"name": ""}
+        brand = mommy.make("Brand")
+        expected_data = get_default_fields(brand)
+        expected_data.update({"name": brand.name})
 
         # When
-        serializer = StoreSerializer()
+        serializer = StoreSerializer(brand)
 
         # Then
-        self.assertEqual(serializer.data, expected_data)
+        self.assertEqual(loads(dumps(serializer.data)), expected_data)
 
 
 class OrderSerializerTest(TestCase):
@@ -53,13 +59,16 @@ class OrderSerializerTest(TestCase):
     def test_fields(self):
         """ Test fields for serializer. """
         # Given
-        expected_data = {"date": None, "store": None}
+        order = mommy.make("Order")
+        expected_data = get_default_fields(order)
+        expected_data.update({"date": order.date.isoformat(),
+                              "store": order.store.id})
 
         # When
-        serializer = OrderSerializer()
+        serializer = OrderSerializer(order)
 
         # Then
-        self.assertEqual(serializer.data, expected_data)
+        self.assertEqual(loads(dumps(serializer.data)), expected_data)
 
 
 class OrderNestedSerializerTest(TestCase):
@@ -68,15 +77,17 @@ class OrderNestedSerializerTest(TestCase):
     def test_fields(self):
         """ Test fields for serializer. """
         # Given
-        store = mommy.make("Store")
-        expected_data = {"date": None,
-                         "store": {"id": store.id, "name": store.name}}
+        order = mommy.make("Order")
+        expected_data = get_default_fields(order)
+        expected_data.update({"date": order.date.isoformat(),
+                              "store": {"id": order.store.id,
+                                        "name": order.store.name}})
 
         # When
-        serializer = OrderNestedSerializer({"date": None, "store": store})
+        serializer = OrderNestedSerializer(order)
 
         # Then
-        self.assertEqual(serializer.data, expected_data)
+        self.assertEqual(loads(dumps(serializer.data)), expected_data)
 
 
 class ItemSerializerTest(TestCase):
@@ -93,15 +104,16 @@ class ItemSerializerTest(TestCase):
                           volume=Volume(l=1),  # noqa
                           weight=Weight(g=1))
         item.refresh_from_db()  # To trigger MeasurementField updates
-        expected_data = {
-            "id": item.id, "name": item.name, "brand": item.brand.id,
-            "unit": self.default_volume_unit, "volume": 0.001, "weight": 1}
+        expected_data = get_default_fields(item)
+        expected_data.update({
+            "name": item.name, "brand": item.brand.id,
+            "unit": self.default_volume_unit, "volume": 0.001, "weight": 1.0})
 
         # When
         serializer = ItemSerializer(item)
 
         # Then
-        self.assertEqual(serializer.data, expected_data)
+        self.assertEqual(loads(dumps(serializer.data)), expected_data)
 
     def test_errors_empty(self):
         """ Test errors on empty data. """
@@ -393,10 +405,11 @@ class ItemNestedSerializerTest(TestCase):
         item = mommy.make("Item",
                           volume=Volume(l=1))  # noqa
         item.refresh_from_db()  # To trigger MeasurementField updates
-        expected_data = {
-            "id": item.id, "name": item.name,
+        expected_data = get_default_fields(item)
+        expected_data.update({
+            "name": item.name,
             "unit": "cubic_meter", "volume": 0.001, "weight": None,
-            "brand": {"id": item.brand.id, "name": item.brand.name}}
+            "brand": {"id": item.brand.id, "name": item.brand.name}})
 
         # When
         serializer = ItemNestedSerializer(item)
@@ -411,9 +424,9 @@ class PurchaseSerializerTest(TestCase):
         """ Test fields for serializer. """
         # Given
         purchase = mommy.make("Purchase", price=10)
-        expected_data = {
-            "id": purchase.id, "price": "10.000", "currency": "USD",
-            "item": purchase.item.id, "order": None}
+        expected_data = get_default_fields(purchase)
+        expected_data.update({"price": "10.000", "currency": "USD",
+                              "item": purchase.item.id, "order": None})
 
         # When
         serializer = PurchaseSerializer(purchase)
@@ -547,15 +560,16 @@ class PurchaseNestedSerializerTest(TestCase):
                               item__volume=Volume(l=1),  # noqa
                               order=order)
         purchase.item.refresh_from_db()  # To trigger MeasurementField updates
-        expected_data = {
-            "id": purchase.id, "price": "10.000", "currency": "USD",
+        expected_data = get_default_fields(purchase)
+        expected_data.update({
+            "price": "10.000", "currency": "USD",
             "item": {"id": purchase.item.id, "name": purchase.item.name,
                      "unit": "cubic_meter", "volume": 0.001, "weight": None,
                      "brand": {"id": purchase.item.brand.id,
                                "name": purchase.item.brand.name}},
             "order": {"id": order.id, "date": order.date.isoformat(),
                       "store": {"id": order.store.id,
-                                "name": order.store.name}}}
+                                "name": order.store.name}}})
 
         # When
         serializer = PurchaseNestedSerializer(purchase)

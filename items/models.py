@@ -1,12 +1,14 @@
 """ Models for items app. """
 from django.db import models
 
+from audit_log.models import AuthStampedModel
+from django_extensions.db.models import TimeStampedModel
 from django_measurement.models import MeasurementField
 from djmoney.models.fields import MoneyField
 from measurement.measures import Volume, Weight
 
 
-class Brand(models.Model):
+class Brand(AuthStampedModel, TimeStampedModel, models.Model):
     """ Representation of a brand (IKEA, Pampers, etc.). """
     name = models.CharField(max_length=128)
 
@@ -15,7 +17,7 @@ class Brand(models.Model):
         return self.name
 
 
-class Store(models.Model):
+class Store(AuthStampedModel, TimeStampedModel, models.Model):
     """ Representation of a store (IKEA, PricesMart, etc.). """
     name = models.CharField(max_length=128)
 
@@ -24,7 +26,7 @@ class Store(models.Model):
         return self.name
 
 
-class Order(models.Model):
+class Order(AuthStampedModel, TimeStampedModel, models.Model):
     """ Representation of a store (IKEA, PricesMart, etc.). """
     date = models.DateField()
     store = models.ForeignKey(Store)
@@ -34,7 +36,7 @@ class Order(models.Model):
         return "{0} - {1}".format(self.store.name, self.date)
 
 
-class Item(models.Model):
+class Item(AuthStampedModel, TimeStampedModel, models.Model):
     """
     Representation of an item:
         Blue Cheese (Generic), 0.5 kg
@@ -54,7 +56,7 @@ class Item(models.Model):
             self.name, self.brand.name, self.volume or self.weight)
 
 
-class Purchase(models.Model):
+class Purchase(AuthStampedModel, TimeStampedModel, models.Model):
     """
     Representation of the purchase of an item (with an order if available):
         Blue Cheese (Generic), 0.5 kg at 50.00 DOP - #1

@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 from django.db import models
 from django.test import TestCase
+from django.utils import timezone
 
 from schmebulock import utils
 
@@ -85,3 +86,33 @@ class GetChoicesTest(TestCase):
 
         # Then
         self.assertEqual(choices, expected_choices)
+
+
+class GetDefaultFieldsTest(TestCase):
+    """ Tests get_default_fields function. """
+
+    def test_get_default_fields(self):
+        """ Test successful call to function. """
+        # Given
+        class DummyClass(object):
+            """ Dummy class to create empty object. """
+            pass
+        obj = DummyClass()
+        setattr(obj, "id", 1)
+        setattr(obj, "created", timezone.now())
+        setattr(obj, "created_by ", None)
+        setattr(obj, "modified ", timezone.now())
+        setattr(obj, "modified_by ", None)
+
+        expected_data = {
+            "id": obj.id,
+            "created": obj.created.isoformat().replace("+00:00", "Z"),
+            "created_by": obj.created_by,
+            "modified": obj.modified.isoformat().replace("+00:00", "Z"),
+            "modified_by": obj.modified_by}
+
+        # When
+        choices = utils.get_default_fields(obj)
+
+        # Then
+        self.assertEqual(choices, expected_data)

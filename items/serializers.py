@@ -6,6 +6,8 @@ from rest_framework import serializers
 
 from .models import Brand, Item, Order, Purchase, Store
 
+DEFAULT_FIELDS = ["id", "created_by", "modified_by", "created", "modified"]
+
 
 class BrandSerializer(serializers.ModelSerializer):
     """ Serializer for Brand model. """
@@ -13,11 +15,20 @@ class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         """ Meta data for serializer. """
         model = Brand
-        fields = ("id", "name")
+        fields = tuple(DEFAULT_FIELDS + ["name"])
 
 
 class StoreSerializer(serializers.ModelSerializer):
     """ Serializer for Store model. """
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = Store
+        fields = tuple(DEFAULT_FIELDS + ["name"])
+
+
+class StoreBlindSerializer(serializers.ModelSerializer):
+    """ Serializer for Store model without audit fields. """
 
     class Meta:
         """ Meta data for serializer. """
@@ -31,18 +42,18 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         """ Meta data for serializer. """
         model = Order
-        fields = ("id", "date", "store")
+        fields = tuple(DEFAULT_FIELDS + ["date", "store"])
 
 
 class OrderNestedSerializer(serializers.ModelSerializer):
     """ Serializer for nested Order model. """
 
-    store = StoreSerializer()
+    store = StoreBlindSerializer()
 
     class Meta:
         """ Meta data for serializer. """
         model = Order
-        fields = ("id", "date", "store")
+        fields = tuple(DEFAULT_FIELDS + ["date", "store"])
 
 
 class ItemSerializer(serializers.ModelSerializer):
@@ -52,7 +63,8 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         """ Meta data for serializer. """
         model = Item
-        fields = ("id", "name", "unit", "volume", "weight", "brand")
+        fields = tuple(DEFAULT_FIELDS + [
+            "name", "unit", "volume", "weight", "brand"])
 
     # Override
     def validate(self, attrs):
@@ -172,12 +184,13 @@ class ItemNestedSerializer(serializers.ModelSerializer):
     unit = serializers.SerializerMethodField()
     volume = serializers.FloatField(source="volume.value")
     weight = serializers.FloatField(source="weight.value")
-    brand = StoreSerializer()
+    brand = StoreBlindSerializer()
 
     class Meta:
         """ Meta data for serializer. """
         model = Item
-        fields = ("id", "name", "unit", "volume", "weight", "brand")
+        fields = tuple(DEFAULT_FIELDS + [
+            "name", "unit", "volume", "weight", "brand"])
 
     def get_unit(self, obj):
         """ Custom field that needs to get data from volume or weight. """
@@ -194,7 +207,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
     class Meta:
         """ Meta data for serializer. """
         model = Purchase
-        fields = ("id", "price", "currency", "item", "order")
+        fields = tuple(DEFAULT_FIELDS + ["price", "currency", "item", "order"])
 
     def validate_currency(self, value):
         """ Validate currency to avoid non-Django raised exception. """
@@ -219,14 +232,30 @@ class PurchaseSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class ItemBlindNestedSerializer(ItemNestedSerializer):
+    """ Serializer for nested Item model without audit fields. """
+    class Meta:
+        """ Meta data for serializer. """
+        model = Item
+        fields = ("id", "name", "unit", "volume", "weight", "brand")
+
+
+class OrderBlindNestedSerializer(OrderNestedSerializer):
+    """ Serializer for nested Order model without audit fields. """
+    class Meta:
+        """ Meta data for serializer. """
+        model = Order
+        fields = ("id", "date", "store")
+
+
 class PurchaseNestedSerializer(serializers.ModelSerializer):
     """ Serializer for nested Item model. """
 
     currency = serializers.CharField(source="price_currency", required=False)
-    item = ItemNestedSerializer()
-    order = OrderNestedSerializer()
+    item = ItemBlindNestedSerializer()
+    order = OrderBlindNestedSerializer()
 
     class Meta:
         """ Meta data for serializer. """
         model = Purchase
-        fields = ("id", "price", "currency", "item", "order")
+        fields = tuple(DEFAULT_FIELDS + ["price", "currency", "item", "order"])

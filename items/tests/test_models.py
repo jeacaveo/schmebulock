@@ -8,6 +8,12 @@ from model_mommy import mommy
 from schmebulock.utils import get_model_fields
 
 
+DEFAULT_FIELDS = ["id",
+                  "created_by", "created_with_session_key",
+                  "modified_by", "modified_with_session_key",
+                  "created", "modified"]
+
+
 class ItemAppTest(TestCase):
     """ Tests for Brand model. """
 
@@ -44,7 +50,7 @@ class BrandModelTest(TestCase):
     def test_fields(self):
         """ Test fields for model. """
         # Given
-        expected_fields = ["id", "name"]
+        expected_fields = DEFAULT_FIELDS + ["name"]
 
         # When
         brand = mommy.make("Brand")
@@ -71,7 +77,7 @@ class StoreModelTest(TestCase):
     def test_fields(self):
         """ Test fields for model. """
         # Given
-        expected_fields = ["id", "name"]
+        expected_fields = DEFAULT_FIELDS + ["name"]
 
         # When
         store = mommy.make("Store")
@@ -95,7 +101,7 @@ class OrderModelTest(TestCase):
     def test_fields(self):
         """ Test fields for model. """
         # Given
-        expected_fields = ["id", "date", "store"]
+        expected_fields = DEFAULT_FIELDS + ["date", "store"]
 
         # When
         order = mommy.make("Order")
@@ -123,7 +129,8 @@ class ItemModelTest(TestCase):
     def test_fields(self):
         """ Test fields for model. """
         # Given
-        expected_fields = ["id", "name", "volume", "weight", "brand"]
+        expected_fields = DEFAULT_FIELDS + [
+            "name", "volume", "weight", "brand"]
 
         # When
         item = mommy.make("Item")
@@ -168,7 +175,8 @@ class PurchaseModelTest(TestCase):
     def test_fields(self):
         """ Test fields for model. """
         # Given
-        expected_fields = ["id", "price_currency", "price", "item", "order"]
+        expected_fields = DEFAULT_FIELDS + [
+            "price_currency", "price", "item", "order"]
 
         # When
         purchase = mommy.make("Purchase")

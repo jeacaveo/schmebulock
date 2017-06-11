@@ -1,4 +1,6 @@
 Django==1.11.2
+django-audit-log==0.7.0
+django-extensions==1.7.9
 django-measurement==2.4.0
 django-money==0.11.2
 django-rest-swagger==2.1.2
