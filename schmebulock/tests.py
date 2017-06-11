@@ -100,9 +100,9 @@ class GetDefaultFieldsTest(TestCase):
         obj = DummyClass()
         setattr(obj, "id", 1)
         setattr(obj, "created", timezone.now())
-        setattr(obj, "created_by ", None)
-        setattr(obj, "modified ", timezone.now())
-        setattr(obj, "modified_by ", None)
+        setattr(obj, "created_by", 2)
+        setattr(obj, "modified", timezone.now())
+        setattr(obj, "modified_by", 3)
 
         expected_data = {
             "id": obj.id,
