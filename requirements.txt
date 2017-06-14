@@ -1,5 +1,4 @@
 Django==1.11.2
-django-audit-log==0.7.0
 django-cities==0.5.0.5
 django-extensions==1.7.9
 django-measurement==2.4.0
@@ -9,3 +8,7 @@ djangorestframework==3.6.3
 djangorestframework-jwt==1.10.0
 psycopg2==2.7.1
 wheel==0.26.0
+
+# Using personal version that holds version of django-audit-log
+# with support for MIDDLEWARE, instead of MIDDLEWARE_CLASSES
+git+https://github.com/jeacaveo/django-audit-log.git@master

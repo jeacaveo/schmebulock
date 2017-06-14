@@ -54,10 +54,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # TODO Django 1.11 incompatibility not allowing django audit log to work
-    # https://github.com/Atomidata/django-audit-log/issues/45
-    # 'audit_log.middleware.JWTAuthMiddleware',
-    # 'audit_log.middleware.UserLoggingMiddleware',
+    # Using personal version: https://github.com/jeacaveo/django-audit-log
+    # that holds version of django-audit-log with support for MIDDLEWARE,
+    # instead of MIDDLEWARE_CLASSES
+    'audit_log.middleware.JWTAuthMiddleware',
+    'audit_log.middleware.UserLoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'schmebulock.urls'
