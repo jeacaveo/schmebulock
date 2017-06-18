@@ -140,8 +140,48 @@ class ItemModelTest(TestCase):
         self.assertEqual(get_model_fields(item), expected_fields)
 
 
+class LocationModelTest(TestCase):
+    """ Tests for Location model. """
+
+    def setUp(self):
+        self.point = GEOSGeometry('POINT(0.00 0.00)')
+
+    def test_string_representation(self):
+        """ Test string representation. """
+        # When
+        location = mommy.make("Location",
+                              address="Address",
+                              district__name="District",
+                              district__city__name="City",
+                              district__city__location=self.point,
+                              district__city__country__name="Country",
+                              district__location=self.point)
+
+        # Then
+        self.assertEqual(str(location), "Address, District, City, Country")
+
+    def test_fields(self):
+        """ Test fields for model. """
+        # Given
+        expected_fields = DEFAULT_FIELDS + ["address", "district"]
+
+        # When
+        location = mommy.make("Location",
+                              district__city__location=self.point,
+                              district__location=self.point)
+
+        # Then
+        self.assertEqual(get_model_fields(location), expected_fields)
+
+
 class PurchaseModelTest(TestCase):
     """ Tests for Purchase model. """
+
+    def setUp(self):
+        point = GEOSGeometry('POINT(0.00 0.00)')
+        self.location = mommy.make("Location",
+                                   district__city__location=point,
+                                   district__location=point)
 
     def test_string_representation(self):
         """ Test string representation. """
@@ -151,7 +191,8 @@ class PurchaseModelTest(TestCase):
                               item__name="Blue Cheese",
                               item__weight=Weight(kg=0.500),
                               item__brand__name="Generic",
-                              order__id=999)
+                              order__id=999,
+                              location=self.location)
 
         # Then
         self.assertEqual(
@@ -166,7 +207,8 @@ class PurchaseModelTest(TestCase):
                               item__name="Blue Cheese",
                               item__weight=Weight(kg=0.500),
                               item__brand__name="Generic",
-                              order=None)
+                              order=None,
+                              location=self.location)
 
         # Then
         self.assertEqual(
@@ -177,44 +219,10 @@ class PurchaseModelTest(TestCase):
         """ Test fields for model. """
         # Given
         expected_fields = DEFAULT_FIELDS + [
-            "price_currency", "price", "item", "order"]
+            "price_currency", "price", "item", "location", "order"]
 
         # When
-        purchase = mommy.make("Purchase")
+        purchase = mommy.make("Purchase", location=self.location)
 
         # Then
         self.assertEqual(get_model_fields(purchase), expected_fields)
-
-
-class LocationModelTest(TestCase):
-    """ Tests for Location model. """
-
-    def setUp(self):
-        self.location = GEOSGeometry('POINT(0.00 0.00)')
-
-    def test_string_representation(self):
-        """ Test string representation. """
-        # When
-        location = mommy.make("Location",
-                              address="Address",
-                              district__name="District",
-                              district__city__name="City",
-                              district__city__location=self.location,
-                              district__city__country__name="Country",
-                              district__location=self.location)
-
-        # Then
-        self.assertEqual(str(location), "Address, District, City, Country")
-
-    def test_fields(self):
-        """ Test fields for model. """
-        # Given
-        expected_fields = DEFAULT_FIELDS + ["address", "district"]
-
-        # When
-        location = mommy.make("Location",
-                              district__city__location=self.location,
-                              district__location=self.location)
-
-        # Then
-        self.assertEqual(get_model_fields(location), expected_fields)

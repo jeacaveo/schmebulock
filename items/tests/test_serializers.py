@@ -451,166 +451,6 @@ class ItemNestedSerializerTest(TestCase):
         self.assertEqual(loads(dumps(serializer.data)), expected_data)
 
 
-class PurchaseSerializerTest(TestCase):
-    """ Tests for Purchase serializer. """
-    def test_fields_data(self):
-        """ Test fields for serializer. """
-        # Given
-        purchase = mommy.make("Purchase", price=10)
-        expected_data = get_default_fields(purchase)
-        expected_data.update({"price": "10.000", "currency": "USD",
-                              "item": purchase.item.id, "order": None})
-
-        # When
-        serializer = PurchaseSerializer(purchase)
-
-        # Then
-        self.assertEqual(serializer.data, expected_data)
-
-    def test_errors_empty(self):
-        """ Test errors on empty data. """
-        # Given
-        expected_data = {"item": ["This field is required."]}
-        data = {}
-
-        # When
-        serializer = PurchaseSerializer(data=data)
-        serializer.is_valid()
-
-        # Then
-        self.assertEqual(serializer.errors, expected_data)
-
-    def test_errors_price_empty(self):
-        """ Test errors on no price data. """
-        # Given
-        expected_data = {"price": ["This field is required."]}
-        data = {"item": mommy.make("Item").id}
-
-        # When
-        serializer = PurchaseSerializer(data=data)
-        serializer.is_valid()
-
-        # Then
-        self.assertEqual(serializer.errors, expected_data)
-
-    def test_errors_null(self):
-        """ Test errors when required fields are null. """
-        # Given
-        expected_data = {"price": ["This field may not be null."],
-                         "item": ["This field may not be null."]}
-        data = {"price": None, "item": None}
-
-        # When
-        serializer = PurchaseSerializer(data=data)
-        serializer.is_valid()
-
-        # Then
-        self.assertEqual(serializer.errors, expected_data)
-
-    def test_save_no_order(self):
-        """ Test successful save when order is not provided. """
-        # Given
-        item = mommy.make("item")
-        data = {"price": 10, "item": item.id}
-
-        # When
-        serializer = PurchaseSerializer(data=data)
-        serializer.is_valid()
-        obj = serializer.save()
-
-        # Then
-        data = serializer.data
-        obj.refresh_from_db()
-        self.assertEqual(obj.price_currency, "USD")
-        self.assertEqual(data.get("price"), "10.000")
-        self.assertEqual(data.get("currency"), "USD")
-        self.assertEqual(data.get("item"), item.id)
-
-    def test_save_with_order(self):
-        """ Test successful save when order is provided. """
-        # Given
-        item = mommy.make("item")
-        order = mommy.make("Order")
-        data = {"price": 10, "item": item.id, "order": order.id}
-
-        # When
-        serializer = PurchaseSerializer(data=data)
-        serializer.is_valid()
-        obj = serializer.save()
-
-        # Then
-        data = serializer.data
-        obj.refresh_from_db()
-        self.assertEqual(obj.price_currency, "USD")
-        self.assertEqual(data.get("price"), "10.000")
-        self.assertEqual(data.get("currency"), "USD")
-        self.assertEqual(data.get("item"), item.id)
-        self.assertEqual(data.get("order"), order.id)
-
-    def test_save_another_currency(self):
-        """ Test successful save when currency different than default one. """
-        item = mommy.make("item")
-        data = {"price": 10, "currency": "DOP", "item": item.id}
-
-        # When
-        serializer = PurchaseSerializer(data=data)
-        serializer.is_valid()
-        obj = serializer.save()
-
-        # Then
-        data = serializer.data
-        obj.refresh_from_db()
-        self.assertEqual(obj.price_currency, "DOP")
-        self.assertEqual(data.get("price"), "10.000")
-        self.assertEqual(data.get("currency"), "DOP")
-        self.assertEqual(data.get("item"), item.id)
-
-    def test_errors_invalid_currency(self):
-        """ Test error when invalid currency is provided. """
-        # Given
-        item = mommy.make("item")
-        expected_data = {
-            "currency": ["'invalid_currency' is an invalid currency code."]}
-        data = {"price": 10, "currency": "invalid_currency", "item": item.id}
-
-        # When
-        serializer = PurchaseSerializer(data=data)
-        serializer.is_valid()
-
-        # Then
-        self.assertEqual(serializer.errors, expected_data)
-
-
-class PurchaseNestedSerializerTest(TestCase):
-    """ Tests for nested Purchase serializer. """
-
-    def test_fields(self):
-        """ Test fields for serializer. """
-        # Given
-        order = mommy.make("Order")
-        purchase = mommy.make("Purchase",
-                              price=10,
-                              item__volume=Volume(l=1),  # noqa
-                              order=order)
-        purchase.item.refresh_from_db()  # To trigger MeasurementField updates
-        expected_data = get_default_fields(purchase)
-        expected_data.update({
-            "price": "10.000", "currency": "USD",
-            "item": {"id": purchase.item.id, "name": purchase.item.name,
-                     "unit": "cubic_meter", "volume": 0.001, "weight": None,
-                     "brand": {"id": purchase.item.brand.id,
-                               "name": purchase.item.brand.name}},
-            "order": {"id": order.id, "date": order.date.isoformat(),
-                      "store": {"id": order.store.id,
-                                "name": order.store.name}}})
-
-        # When
-        serializer = PurchaseNestedSerializer(purchase)
-
-        # Then
-        self.assertEqual(loads(dumps(serializer.data)), expected_data)
-
-
 class LocationSerializerTest(TestCase):
     """ Tests for Location serializer. """
 
@@ -689,6 +529,191 @@ class LocationNestedSerializerTest(TestCase):
 
         # When
         serializer = LocationNestedSerializer(location)
+
+        # Then
+        self.assertEqual(loads(dumps(serializer.data)), expected_data)
+
+
+class PurchaseSerializerTest(TestCase):
+    """ Tests for Purchase serializer. """
+
+    def setUp(self):
+        point = GEOSGeometry('POINT(0.00 0.00)')
+        self.location = mommy.make("Location",
+                                   district__city__location=point,
+                                   district__location=point)
+
+    def test_fields_data(self):
+        """ Test fields for serializer. """
+        # Given
+        purchase = mommy.make("Purchase", price=10, location=self.location)
+        expected_data = get_default_fields(purchase)
+        expected_data.update({"price": "10.000", "currency": "USD",
+                              "item": purchase.item.id, "order": None,
+                              "location": self.location.id})
+
+        # When
+        serializer = PurchaseSerializer(purchase)
+
+        # Then
+        self.assertEqual(serializer.data, expected_data)
+
+    def test_errors_empty(self):
+        """ Test errors on empty data. """
+        # Given
+        expected_data = {"item": ["This field is required."],
+                         "location": ["This field is required."]}
+        data = {}
+
+        # When
+        serializer = PurchaseSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+    def test_errors_price_empty(self):
+        """ Test errors on no price data. """
+        # Given
+        expected_data = {"price": ["This field is required."]}
+        data = {"item": mommy.make("Item").id, "location": self.location.id}
+
+        # When
+        serializer = PurchaseSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+    def test_errors_null(self):
+        """ Test errors when required fields are null. """
+        # Given
+        expected_data = {"price": ["This field may not be null."],
+                         "item": ["This field may not be null."],
+                         "location": ["This field may not be null."]}
+        data = {"price": None, "item": None, "location": None}
+
+        # When
+        serializer = PurchaseSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+    def test_save_no_order(self):
+        """ Test successful save when order is not provided. """
+        # Given
+        item = mommy.make("item")
+        data = {"price": 10, "item": item.id, "location": self.location.id}
+
+        # When
+        serializer = PurchaseSerializer(data=data)
+        serializer.is_valid()
+        obj = serializer.save()
+
+        # Then
+        data = serializer.data
+        obj.refresh_from_db()
+        self.assertEqual(obj.price_currency, "USD")
+        self.assertEqual(data.get("price"), "10.000")
+        self.assertEqual(data.get("currency"), "USD")
+        self.assertEqual(data.get("item"), item.id)
+
+    def test_save_with_order(self):
+        """ Test successful save when order is provided. """
+        # Given
+        item = mommy.make("item")
+        order = mommy.make("Order")
+        data = {"price": 10, "item": item.id, "order": order.id,
+                "location": self.location.id}
+
+        # When
+        serializer = PurchaseSerializer(data=data)
+        serializer.is_valid()
+        obj = serializer.save()
+
+        # Then
+        data = serializer.data
+        obj.refresh_from_db()
+        self.assertEqual(obj.price_currency, "USD")
+        self.assertEqual(data.get("price"), "10.000")
+        self.assertEqual(data.get("currency"), "USD")
+        self.assertEqual(data.get("item"), item.id)
+        self.assertEqual(data.get("order"), order.id)
+
+    def test_save_another_currency(self):
+        """ Test successful save when currency different than default one. """
+        item = mommy.make("item")
+        data = {"price": 10, "currency": "DOP", "item": item.id,
+                "location": self.location.id}
+
+        # When
+        serializer = PurchaseSerializer(data=data)
+        serializer.is_valid()
+        obj = serializer.save()
+
+        # Then
+        data = serializer.data
+        obj.refresh_from_db()
+        self.assertEqual(obj.price_currency, "DOP")
+        self.assertEqual(data.get("price"), "10.000")
+        self.assertEqual(data.get("currency"), "DOP")
+        self.assertEqual(data.get("item"), item.id)
+
+    def test_errors_invalid_currency(self):
+        """ Test error when invalid currency is provided. """
+        # Given
+        item = mommy.make("item")
+        expected_data = {
+            "currency": ["'invalid_currency' is an invalid currency code."]}
+        data = {"price": 10, "currency": "invalid_currency", "item": item.id,
+                "location": self.location.id}
+
+        # When
+        serializer = PurchaseSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+
+class PurchaseNestedSerializerTest(TestCase):
+    """ Tests for nested Purchase serializer. """
+
+    def setUp(self):
+        point = GEOSGeometry('POINT(0.00 0.00)')
+        self.location = mommy.make("Location",
+                                   address="Address",
+                                   district__name="District",
+                                   district__city__name="City",
+                                   district__city__location=point,
+                                   district__city__country__name="Country",
+                                   district__location=point)
+
+    def test_fields(self):
+        """ Test fields for serializer. """
+        # Given
+        order = mommy.make("Order")
+        purchase = mommy.make("Purchase",
+                              price=10,
+                              item__volume=Volume(l=1),  # noqa
+                              order=order,
+                              location=self.location)
+        purchase.item.refresh_from_db()  # To trigger MeasurementField updates
+        expected_data = get_default_fields(purchase)
+        expected_data.update({
+            "price": "10.000", "currency": "USD",
+            "item": {"id": purchase.item.id, "name": purchase.item.name,
+                     "unit": "cubic_meter", "volume": 0.001, "weight": None,
+                     "brand": {"id": purchase.item.brand.id,
+                               "name": purchase.item.brand.name}},
+            "order": {"id": order.id, "date": order.date.isoformat(),
+                      "store": {"id": order.store.id,
+                                "name": order.store.name}},
+            "location": "Address, District, City, Country"})
+
+        # When
+        serializer = PurchaseNestedSerializer(purchase)
 
         # Then
         self.assertEqual(loads(dumps(serializer.data)), expected_data)

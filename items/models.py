@@ -73,27 +73,6 @@ class Item(AuthStampedModel, TimeStampedModel, models.Model):
         ordering = ['-created']
 
 
-class Purchase(AuthStampedModel, TimeStampedModel, models.Model):
-    """
-    Representation of the purchase of an item (with an order if available):
-        Blue Cheese (Generic), 0.5 kg at 50.00 DOP - #1
-        Bacon (XXX), 1.0 lb at 1.00 USD - #N/A
-
-    """
-    price = MoneyField(max_digits=15, decimal_places=3, default_currency="USD")
-    item = models.ForeignKey(Item)
-    order = models.ForeignKey(Order, null=True, blank=True)
-
-    def __str__(self):
-        """ String representation for model. """
-        return "{0} at {1} - #{2}".format(
-            self.item, self.price, self.order.id if self.order else "N/A")
-
-    class Meta:
-        """ Meta data for model. """
-        ordering = ['-created']
-
-
 class Location(AuthStampedModel, TimeStampedModel, models.Model):
     """
     Representation of a location:
@@ -108,6 +87,28 @@ class Location(AuthStampedModel, TimeStampedModel, models.Model):
         return "{0}, {1}, {2}, {3}".format(
             self.address, self.district.name,
             self.district.city.name, self.district.city.country.name)
+
+    class Meta:
+        """ Meta data for model. """
+        ordering = ['-created']
+
+
+class Purchase(AuthStampedModel, TimeStampedModel, models.Model):
+    """
+    Representation of the purchase of an item (with an order if available):
+        Blue Cheese (Generic), 0.5 kg at 50.00 DOP - #1
+        Bacon (XXX), 1.0 lb at 1.00 USD - #N/A
+
+    """
+    price = MoneyField(max_digits=15, decimal_places=3, default_currency="USD")
+    item = models.ForeignKey(Item)
+    location = models.ForeignKey(Location)
+    order = models.ForeignKey(Order, null=True, blank=True)
+
+    def __str__(self):
+        """ String representation for model. """
+        return "{0} at {1} - #{2}".format(
+            self.item, self.price, self.order.id if self.order else "N/A")
 
     class Meta:
         """ Meta data for model. """

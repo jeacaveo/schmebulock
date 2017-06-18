@@ -214,6 +214,48 @@ class ItemNestedSerializer(serializers.ModelSerializer):
                 else obj.weight.unit if obj.weight else None)
 
 
+class LocationSerializer(serializers.ModelSerializer):
+    """ Serializer for Location model. """
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = Location
+        fields = tuple(DEFAULT_FIELDS + ["address", "district"])
+
+
+class CityNestedSerializer(serializers.ModelSerializer):
+    """ Serializer for nested City model. """
+
+    country = NameModelSerializer()
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = city_models.City
+        fields = ("id", "name", "country")
+
+
+class DistrictNestedSerializer(serializers.ModelSerializer):
+    """ Serializer for nested District model. """
+
+    city = CityNestedSerializer()
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = city_models.District
+        fields = ("id", "name", "city")
+
+
+class LocationNestedSerializer(serializers.ModelSerializer):
+    """ Serializer for nested Location model. """
+
+    district = DistrictNestedSerializer()
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = Location
+        fields = tuple(DEFAULT_FIELDS + ["address", "district"])
+
+
 class PurchaseSerializer(serializers.ModelSerializer):
     """ Serializer for Purchase model. """
     currency = serializers.CharField(source="price_currency", required=False)
@@ -221,7 +263,8 @@ class PurchaseSerializer(serializers.ModelSerializer):
     class Meta:
         """ Meta data for serializer. """
         model = Purchase
-        fields = tuple(DEFAULT_FIELDS + ["price", "currency", "item", "order"])
+        fields = tuple(DEFAULT_FIELDS +
+                       ["price", "currency", "item", "order", "location"])
 
     def validate_currency(self, value):
         """ Validate currency to avoid non-Django raised exception. """
@@ -268,50 +311,10 @@ class PurchaseNestedSerializer(serializers.ModelSerializer):
     currency = serializers.CharField(source="price_currency", required=False)
     item = ItemBlindNestedSerializer()
     order = OrderBlindNestedSerializer()
+    location = serializers.StringRelatedField()
 
     class Meta:
         """ Meta data for serializer. """
         model = Purchase
-        fields = tuple(DEFAULT_FIELDS + ["price", "currency", "item", "order"])
-
-
-class LocationSerializer(serializers.ModelSerializer):
-    """ Serializer for Location model. """
-
-    class Meta:
-        """ Meta data for serializer. """
-        model = Location
-        fields = tuple(DEFAULT_FIELDS + ["address", "district"])
-
-
-class CityNestedSerializer(serializers.ModelSerializer):
-    """ Serializer for nested City model. """
-
-    country = NameModelSerializer()
-
-    class Meta:
-        """ Meta data for serializer. """
-        model = city_models.City
-        fields = ("id", "name", "country")
-
-
-class DistrictNestedSerializer(serializers.ModelSerializer):
-    """ Serializer for nested District model. """
-
-    city = CityNestedSerializer()
-
-    class Meta:
-        """ Meta data for serializer. """
-        model = city_models.District
-        fields = ("id", "name", "city")
-
-
-class LocationNestedSerializer(serializers.ModelSerializer):
-    """ Serializer for nested Location model. """
-
-    district = DistrictNestedSerializer()
-
-    class Meta:
-        """ Meta data for serializer. """
-        model = Location
-        fields = tuple(DEFAULT_FIELDS + ["address", "district"])
+        fields = tuple(DEFAULT_FIELDS +
+                       ["price", "currency", "item", "order", "location"])
