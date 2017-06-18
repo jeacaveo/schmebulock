@@ -1,12 +1,26 @@
 """ Serializers of items app. """
+from cities import models as city_models
 from djmoney import settings as djmoney_settings
 from measurement.measures import Volume, Weight
 from rest_framework import serializers
 
 
-from .models import Brand, Item, Order, Purchase, Store
+from .models import Brand, Item, Location, Order, Purchase, Store
 
 DEFAULT_FIELDS = ["id", "created_by", "modified_by", "created", "modified"]
+
+
+class NameModelSerializer(serializers.Serializer):
+    """ Serializer for id and name fields only. """
+
+    id = serializers.IntegerField()  # pylint: disable=invalid-name
+    name = serializers.CharField(max_length=256)
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -249,7 +263,7 @@ class OrderBlindNestedSerializer(OrderNestedSerializer):
 
 
 class PurchaseNestedSerializer(serializers.ModelSerializer):
-    """ Serializer for nested Item model. """
+    """ Serializer for nested Purchase model. """
 
     currency = serializers.CharField(source="price_currency", required=False)
     item = ItemBlindNestedSerializer()
@@ -259,3 +273,45 @@ class PurchaseNestedSerializer(serializers.ModelSerializer):
         """ Meta data for serializer. """
         model = Purchase
         fields = tuple(DEFAULT_FIELDS + ["price", "currency", "item", "order"])
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    """ Serializer for Location model. """
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = Location
+        fields = tuple(DEFAULT_FIELDS + ["address", "district"])
+
+
+class CityNestedSerializer(serializers.ModelSerializer):
+    """ Serializer for nested City model. """
+
+    country = NameModelSerializer()
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = city_models.City
+        fields = ("id", "name", "country")
+
+
+class DistrictNestedSerializer(serializers.ModelSerializer):
+    """ Serializer for nested District model. """
+
+    city = CityNestedSerializer()
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = city_models.District
+        fields = ("id", "name", "city")
+
+
+class LocationNestedSerializer(serializers.ModelSerializer):
+    """ Serializer for nested Location model. """
+
+    district = DistrictNestedSerializer()
+
+    class Meta:
+        """ Meta data for serializer. """
+        model = Location
+        fields = tuple(DEFAULT_FIELDS + ["address", "district"])

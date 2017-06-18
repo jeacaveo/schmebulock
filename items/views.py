@@ -94,3 +94,29 @@ class PurchaseViewSet(viewsets.ModelViewSet):
                 self.request.query_params.get("nested")):
             return serializers.PurchaseNestedSerializer
         return super().get_serializer_class()
+
+
+class LocationViewSet(viewsets.ModelViewSet):
+    """
+    Endpoint for Location.
+
+    GET parameters:
+
+        'nested' (boolean): get detailed information on foreign key fields.
+
+    """
+    queryset = models.Location.objects.all()
+    serializer_class = serializers.LocationSerializer
+
+    # Override
+    def get_serializer_class(self):
+        """
+        Override!
+
+        Using custom nested serializer when requested.
+
+        """
+        if (self.request.method == "GET" and
+                self.request.query_params.get("nested")):
+            return serializers.LocationNestedSerializer
+        return super().get_serializer_class()

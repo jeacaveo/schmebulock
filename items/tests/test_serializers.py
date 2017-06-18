@@ -1,6 +1,7 @@
 """ Test for all serializers of items app. """
 from json import dumps, loads
 
+from django.contrib.gis.geos import GEOSGeometry
 from django.test import TestCase
 
 from measurement.measures import Volume, Weight
@@ -12,11 +13,42 @@ from ..serializers import (
     BrandSerializer,
     ItemSerializer,
     ItemNestedSerializer,
+    LocationSerializer,
+    LocationNestedSerializer,
+    NameModelSerializer,
     OrderSerializer,
     OrderNestedSerializer,
     PurchaseSerializer,
     PurchaseNestedSerializer,
     StoreSerializer)
+
+
+class NameModelSerializerTest(TestCase):
+    """ Tests for generic name serializer. """
+
+    def test_fields(self):
+        """ Test fields for serializer. """
+        # Given
+        expected_data = {"id": None, "name": ""}
+
+        # When
+        serializer = NameModelSerializer()
+
+        # Then
+        self.assertEqual(loads(dumps(serializer.data)), expected_data)
+
+    def test_abstract_methods(self):
+        """ Test abstract methods are overriden to None. """
+        # Given
+        serializer = NameModelSerializer()
+
+        # When
+        create = serializer.create(None)
+        update = serializer.update(None, None)
+
+        # Then
+        self.assertIsNone(create)
+        self.assertIsNone(update)
 
 
 class BrandSerializerTest(TestCase):
@@ -92,6 +124,7 @@ class OrderNestedSerializerTest(TestCase):
 
 class ItemSerializerTest(TestCase):
     """ Tests for Item serializer. """
+
     def setUp(self):
         self.default_volume_unit = "cubic_meter"
         self.default_weight_unit = "g"
@@ -573,6 +606,89 @@ class PurchaseNestedSerializerTest(TestCase):
 
         # When
         serializer = PurchaseNestedSerializer(purchase)
+
+        # Then
+        self.assertEqual(loads(dumps(serializer.data)), expected_data)
+
+
+class LocationSerializerTest(TestCase):
+    """ Tests for Location serializer. """
+
+    def setUp(self):
+        self.location = GEOSGeometry('POINT(0.00 0.00)')
+
+    def test_fields_data(self):
+        """ Test fields for serializer. """
+        # Given
+        location = mommy.make("Location",
+                              district__city__location=self.location,
+                              district__location=self.location)
+        expected_data = get_default_fields(location)
+        expected_data.update({"address": location.address,
+                              "district": location.district.id})
+
+        # When
+        serializer = LocationSerializer(location)
+
+        # Then
+        self.assertEqual(serializer.data, expected_data)
+
+    def test_errors_empty(self):
+        """ Test errors on empty data. """
+        # Given
+        expected_data = {"address": ["This field is required."],
+                         "district": ["This field is required."]}
+        data = {}
+
+        # When
+        serializer = LocationSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+    def test_errors_null(self):
+        """ Test errors when required fields are null. """
+        # Given
+        expected_data = {"address": ["This field may not be null."],
+                         "district": ["This field may not be null."]}
+        data = {"address": None, "district": None}
+
+        # When
+        serializer = LocationSerializer(data=data)
+        serializer.is_valid()
+
+        # Then
+        self.assertEqual(serializer.errors, expected_data)
+
+
+class LocationNestedSerializerTest(TestCase):
+    """ Tests for nested Location serializer. """
+
+    def setUp(self):
+        self.location = GEOSGeometry('POINT(0.00 0.00)')
+
+    def test_fields(self):
+        """ Test fields for serializer. """
+        # Given
+        location = mommy.make("Location",
+                              district__city__location=self.location,
+                              district__location=self.location)
+        district = location.district
+        city = district.city
+        country = city.country
+        expected_data = get_default_fields(location)
+        expected_data.update({
+            "address": location.address,
+            "district": {"id": district.id,
+                         "name": district.name,
+                         "city": {"id": city.id,
+                                  "name": city.name,
+                                  "country": {"id": country.id,
+                                              "name": country.name}}}})
+
+        # When
+        serializer = LocationNestedSerializer(location)
 
         # Then
         self.assertEqual(loads(dumps(serializer.data)), expected_data)

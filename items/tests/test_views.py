@@ -1,4 +1,5 @@
 """ Tests for all views of items app. """
+from django.contrib.gis.geos import GEOSGeometry
 
 from model_mommy import mommy
 
@@ -306,6 +307,81 @@ class PurchaseEndpointTests(APITestCase):
                                 "name": order.store.name}}})
         url = reverse("{}-detail".format(self.endpoint_name),
                       args=[purchase.id])
+
+        # When
+        response = self.client.get(url, data={"nested": True})
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), expected_data)
+
+
+class LocationEndpointTests(APITestCase):
+    """ Test Location endpoint.  """
+
+    endpoint_name = "location"
+
+    def setUp(self):
+        """ Setup for tests. """
+        self.client = APIClient()
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Bearer {0}".format(
+                get_authentication_token()))
+        self.location = GEOSGeometry('POINT(0.00 0.00)')
+
+    def test_get_list_empty(self):
+        """ Test GET list/all returns expected when no data available. """
+        # Given
+        expected_data = []
+        url = reverse("{}-list".format(self.endpoint_name))
+
+        # When
+        response = self.client.get(url)
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["results"], expected_data)
+
+    def test_get_list(self):
+        """ Test GET list/all expected results when data available. """
+        # Given
+        location = mommy.make("Location",
+                              district__city__location=self.location,
+                              district__location=self.location)
+        expected_data = get_default_fields(location)
+        expected_data.update({"address": location.address,
+                              "district": location.district.id})
+        url = reverse("{}-list".format(self.endpoint_name))
+
+        # When
+        response = self.client.get(url)
+        data = response.json()["results"]
+
+        # Then
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0], expected_data)
+
+    def test_get_detail_nested(self):
+        """ Test GET detail nested returns nested data. """
+        # Given
+        location = mommy.make("Location",
+                              district__city__location=self.location,
+                              district__location=self.location)
+        district = location.district
+        city = district.city
+        country = city.country
+        expected_data = get_default_fields(location)
+        expected_data.update({
+            "address": location.address,
+            "district": {"id": district.id,
+                         "name": district.name,
+                         "city": {"id": city.id,
+                                  "name": city.name,
+                                  "country": {"id": country.id,
+                                              "name": country.name}}}})
+        url = reverse("{}-detail".format(self.endpoint_name),
+                      args=[location.id])
 
         # When
         response = self.client.get(url, data={"nested": True})

@@ -1,4 +1,5 @@
 """ Test for all models of items app. """
+from django.contrib.gis.geos import GEOSGeometry
 from django.test import TestCase
 
 from djmoney.models.fields import MoneyPatched
@@ -183,3 +184,37 @@ class PurchaseModelTest(TestCase):
 
         # Then
         self.assertEqual(get_model_fields(purchase), expected_fields)
+
+
+class LocationModelTest(TestCase):
+    """ Tests for Location model. """
+
+    def setUp(self):
+        self.location = GEOSGeometry('POINT(0.00 0.00)')
+
+    def test_string_representation(self):
+        """ Test string representation. """
+        # When
+        location = mommy.make("Location",
+                              address="Address",
+                              district__name="District",
+                              district__city__name="City",
+                              district__city__location=self.location,
+                              district__city__country__name="Country",
+                              district__location=self.location)
+
+        # Then
+        self.assertEqual(str(location), "Address, District, City, Country")
+
+    def test_fields(self):
+        """ Test fields for model. """
+        # Given
+        expected_fields = DEFAULT_FIELDS + ["address", "district"]
+
+        # When
+        location = mommy.make("Location",
+                              district__city__location=self.location,
+                              district__location=self.location)
+
+        # Then
+        self.assertEqual(get_model_fields(location), expected_fields)

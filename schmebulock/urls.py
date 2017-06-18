@@ -28,6 +28,7 @@ ROUTER.register(r"brands", item_views.BrandViewSet)
 ROUTER.register(r"stores", item_views.StoreViewSet)
 ROUTER.register(r"orders", item_views.OrderViewSet)
 ROUTER.register(r"items", item_views.ItemViewSet)
+ROUTER.register(r"locations", item_views.LocationViewSet)
 ROUTER.register(r"purchases", item_views.PurchaseViewSet)
 
 

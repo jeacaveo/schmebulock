@@ -2,6 +2,7 @@
 from django.db import models
 
 from audit_log.models import AuthStampedModel
+from cities.models import District
 from django_extensions.db.models import TimeStampedModel
 from django_measurement.models import MeasurementField
 from djmoney.models.fields import MoneyField
@@ -87,6 +88,26 @@ class Purchase(AuthStampedModel, TimeStampedModel, models.Model):
         """ String representation for model. """
         return "{0} at {1} - #{2}".format(
             self.item, self.price, self.order.id if self.order else "N/A")
+
+    class Meta:
+        """ Meta data for model. """
+        ordering = ['-created']
+
+
+class Location(AuthStampedModel, TimeStampedModel, models.Model):
+    """
+    Representation of a location:
+        Casui Street #4, Los Rios, Santo Domingo, República Dominicana.
+
+    """
+    address = models.CharField(max_length=256)
+    district = models.ForeignKey(District, related_name="location_district")
+
+    def __str__(self):
+        """ String representation for model. """
+        return "{0}, {1}, {2}, {3}".format(
+            self.address, self.district.name,
+            self.district.city.name, self.district.city.country.name)
 
     class Meta:
         """ Meta data for model. """
