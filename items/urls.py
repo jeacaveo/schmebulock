@@ -1,4 +1,4 @@
-"""schmebulock URL Configuration
+"""items URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.11/topics/http/urls/
@@ -14,19 +14,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r"^blog/", include("blog.urls"))
 """
 from django.conf.urls import url, include
-from django.contrib import admin
 
-from rest_framework_jwt.views import obtain_jwt_token
-from rest_framework_swagger.views import get_swagger_view
+from rest_framework import routers
 
-from items import urls as item_urls
+from . import views
+
+
+ROUTER = routers.DefaultRouter()
+ROUTER.register(r"brands", views.BrandViewSet)
+ROUTER.register(r"stores", views.StoreViewSet)
+ROUTER.register(r"orders", views.OrderViewSet)
+ROUTER.register(r"items", views.ItemViewSet)
+ROUTER.register(r"locations", views.LocationViewSet)
+ROUTER.register(r"purchases", views.PurchaseViewSet)
 
 
 urlpatterns = [  # pylint: disable=invalid-name
-    url(r"^admin/", admin.site.urls),
-    url(r"^api/auth/",
-        include("rest_framework.urls", namespace="rest_framework")),
-    url(r"^api/auth/token/", obtain_jwt_token),
-    url(r"^api/docs/", get_swagger_view(title="Schmebulock API")),
-    url(r"^api/", include(item_urls)),
+    url(r"^", include(ROUTER.urls)),
 ]
