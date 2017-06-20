@@ -109,6 +109,7 @@ class PurchaseViewSet(viewsets.ModelViewSet):
     """
     queryset = models.Purchase.objects.all()
     serializer_class = serializers.PurchaseSerializer
+    metadata_class = metadata.CustomPurchaseMetadata
 
     # Override
     def get_serializer_class(self):
