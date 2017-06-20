@@ -4,6 +4,7 @@ from rest_framework import viewsets
 
 from . import models
 from . import serializers
+from . import metadata
 
 
 class BrandViewSet(viewsets.ModelViewSet):
@@ -55,6 +56,7 @@ class ItemViewSet(viewsets.ModelViewSet):
     """
     queryset = models.Item.objects.all()
     serializer_class = serializers.ItemSerializer
+    metadata_class = metadata.CustomItemMetadata
 
     # Override
     def get_serializer_class(self):
